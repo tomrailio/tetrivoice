@@ -1,0 +1,5 @@
+# TETRIVOIX: TETRIS OF THE FUTURE
+
+This repository hosts Tetrivoix; a game that will pioneer a path forward in videogames on a scale never seen before. Combining crisp three-dimensional graphics with the power of voice, Tetrivoix breaks the physical barrier between you and the game. No longer are you restrained to your human bodies and slow physical reaction times. Now you can tell your game exactly what you want it to do. 
+
+I, the brilliant creator of Tetrivoix, am humbly and amicably giving away the source code to this game of no cost to you. While I could make millions of dollars if I were to merchandise it, I believe that it is imperative that the public have access to this powerful, landscape changing piece of technology. Please use responsibly; I cannot and will not be held accountable for any negative or positive effects this technology has on you or your equipment (no matter how vast of a fortune you stand to gain).
