@@ -36,7 +36,7 @@ function init() {
 
   // Setup perspective cameras
   camera = new THREE.PerspectiveCamera(
-    50,
+    60,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
@@ -54,19 +54,228 @@ function init() {
   controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   // Setup placeholder cube
-  const geometry = new THREE.BoxGeometry(2,2,2);
+  const geometry = new THREE.BoxGeometry(4, 4, 4);
   const material = new THREE.MeshPhongMaterial({color: 0x9e0018});
   cube = new THREE.Mesh(geometry, material);
   cube.position.y = 20;
+  cube.position.z = -3;
+  cube.position.x = -2;
   scene.add(cube);
   cube.castShadow = true;
 
   // Setup placeholder floor
-  const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
+  const floorGeometry = new THREE.BoxGeometry(100, 0.1, 100);
   const floorMaterial = new THREE.MeshLambertMaterial({color: 0x313a3b});
   floorCube = new THREE.Mesh(floorGeometry, floorMaterial);
   floorCube.position.y = -1;
   scene.add(floorCube);
+  // DUMB Floor Grid
+  const lineMaterial = new THREE.MeshLambertMaterial({
+    color: 0x000000,
+    opacity: 1,
+    transparent: true,
+  });
+  let points = [];
+  points.push(new THREE.Vector3(0, 0, -21));
+  points.push(new THREE.Vector3(-20, 0, -21));
+  points.push(new THREE.Vector3(20, 0, -21));
+  let line = new THREE.BufferGeometry().setFromPoints(points);
+  let newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, -17));
+  points.push(new THREE.Vector3(20, 0, -17));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, -13));
+  points.push(new THREE.Vector3(20, 0, -13));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, -9));
+  points.push(new THREE.Vector3(20, 0, -9));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, -5));
+  points.push(new THREE.Vector3(20, 0, -5));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, -1));
+  points.push(new THREE.Vector3(20, 0, -1));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, 3));
+  points.push(new THREE.Vector3(20, 0, 3));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, 7));
+  points.push(new THREE.Vector3(20, 0, 7));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, 11));
+  points.push(new THREE.Vector3(20, 0, 11));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, 15));
+  points.push(new THREE.Vector3(20, 0, 15));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, 0, 19));
+  points.push(new THREE.Vector3(20, 0, 19));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  // vertical lines
+  points = [];
+  points.push(new THREE.Vector3(0, -1, 21));
+  points.push(new THREE.Vector3(0, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(4, -1, 21));
+  points.push(new THREE.Vector3(4, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-4, -1, 21));
+  points.push(new THREE.Vector3(-4, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-8, -1, 21));
+  points.push(new THREE.Vector3(-8, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(8, -1, 21));
+  points.push(new THREE.Vector3(8, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(12, -1, 21));
+  points.push(new THREE.Vector3(12, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-12, -1, 21));
+  points.push(new THREE.Vector3(-12, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(16, -1, 21));
+  points.push(new THREE.Vector3(16, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-16, -1, 21));
+  points.push(new THREE.Vector3(-16, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(20, -1, 21));
+  points.push(new THREE.Vector3(20, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  points = [];
+  points.push(new THREE.Vector3(-20, -1, 21));
+  points.push(new THREE.Vector3(-20, 0, -21));
+  line = new THREE.BufferGeometry().setFromPoints(points);
+  newline = new THREE.Line(line, lineMaterial);
+  scene.add(newline);
+
+  // function makeLine(array) {
+  //   let points = [];
+  //   console.log(array[0]);
+  //   console.log(array[0], array[1], array[2]);
+  //   points.push(new THREE.Vector3(array[0], array[1], array[2]));
+  //   console.log(points[0]);
+  //   let line = new THREE.BufferGeometry().setFromPoints(points[0]);
+  //   let newline = new THREE.Line(line, lineMaterial);
+  //   scene.add(newline);
+  // }
+
+  // makeLine([-21, 21, 0]);
+
+  // Setup placeholder walls
+  const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
+  const poleWallGeometry = new THREE.BoxGeometry(40, 50, 0.1);
+  const wallMaterial = new THREE.MeshLambertMaterial({
+    color: 0x9e0018,
+    opacity: 0.1,
+    transparent: true,
+  });
+  // Left
+  leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial);
+  leftWallCube.position.x = -20;
+  leftWallCube.position.y = 23;
+  leftWallCube.position.z = -1;
+  scene.add(leftWallCube);
+  // Right
+  rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial);
+  rightWallCube.position.x = 20;
+  rightWallCube.position.y = 23;
+  rightWallCube.position.z = -1;
+  scene.add(rightWallCube);
+  // south
+  northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial);
+  northWallCube.position.x = 0;
+  northWallCube.position.y = 23;
+  northWallCube.position.z = 19;
+  scene.add(northWallCube);
+  // north
+  southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial);
+  southWallCube.position.x = 0;
+  southWallCube.position.y = 23;
+  southWallCube.position.z = -21;
+  scene.add(southWallCube);
 }
 
 // Setup cube animation vars
