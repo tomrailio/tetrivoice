@@ -4,6 +4,10 @@ let camera;
 let renderer;
 let cube;
 let floorCube;
+// Cube animation vars
+let dxPerFrameX = 0;
+let dxPerFrameY = 1;
+let dxPerFrameZ = 0;
 
 // Singular function to initialize scene + rendering
 function init() {
@@ -11,7 +15,7 @@ function init() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color( 0xcce0ff );
   // Add Fog
-  scene.fog = new THREE.Fog( 0xcce0ff, 10, 10000 );
+  // scene.fog = new THREE.Fog( 0xcce0ff, 10, 10000 );
 
   // Lights
   scene.add( new THREE.AmbientLight ( 0x666666 ));
@@ -47,6 +51,7 @@ function init() {
 
   // Setup renderer
   renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+  renderer.shadowMap.enabled = true; // Enable shadows
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
@@ -62,16 +67,18 @@ function init() {
   cube.position.x = -2;
   scene.add(cube);
   cube.castShadow = true;
+  cube.receiveShadow = true;
 
   // Setup placeholder floor
   const floorGeometry = new THREE.BoxGeometry(100, 0.1, 100);
-  const floorMaterial = new THREE.MeshLambertMaterial({color: 0x313a3b});
+  const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
   floorCube = new THREE.Mesh(floorGeometry, floorMaterial);
+  floorCube.receiveShadow = true;
   floorCube.position.y = -1;
   scene.add(floorCube);
 
   // Draw floor grid
-  const lineMaterial = new THREE.MeshLambertMaterial({
+  const lineMaterial = new THREE.MeshPhongMaterial({
     color: 0x000000,
     opacity: 1,
     transparent: true,
@@ -94,22 +101,22 @@ function init() {
   function horizontalLines() {
     let start = arguments[0][2];
     for (let i = 0; i < arguments[2]; i += 1) {
-      drawLine([arguments[0][0], arguments[0][1], start], [-arguments[0][0], (arguments[0][1] + 1), start]);
+      drawLine([arguments[0][0], arguments[0][1], start], [-arguments[0][0], arguments[0][1], start]);
       start += arguments[1];
     }
   }
   horizontalLines([-20, 0, -21], 4, 11);
 
   // Draws a specified set of vertical lines at a given start and unit step.
-  // Ex.: horizontalLines([St,ar,t], Step, Total)
+  // Ex.: verticalLines([St,ar,t], Step, Total)
   function verticalLines() {
     let start = arguments[0][0];
     for (let i = 0; i < arguments[2]; i += 1) {
-      drawLine([start, arguments[0][1], arguments[0][2]], [start, (arguments[0][1] + 1), -arguments[0][2]]);
+      drawLine([start, arguments[0][1], arguments[0][2]], [start, arguments[0][1], -arguments[0][2]]);
       start += arguments[1];
     }
   }
-  verticalLines([-20, -1, 21], 4, 11);
+  verticalLines([-20, 0, 21], 4, 11);
 
   // Setup placeholder walls
   const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
@@ -144,11 +151,6 @@ function init() {
   southWallCube.position.z = -21;
   scene.add(southWallCube);
 }
-
-// Setup cube animation vars
-let dxPerFrameX = 0;
-let dxPerFrameY = 1;
-let dxPerFrameZ = 0;
 
 // Animate scene
 function animate() {
