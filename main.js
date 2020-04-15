@@ -9,11 +9,26 @@ let dxPerFrameX = 0;
 let dxPerFrameY = 1;
 let dxPerFrameZ = 0;
 
+// Spawn cube function
+// Expand to handle all blocks.
+function spawnCube() {
+  const geometry = new THREE.BoxGeometry(4, 4, 4);
+  const material = new THREE.MeshPhongMaterial({color: 0x9e0018});
+  cube = new THREE.Mesh(geometry, material);
+  cube.position.y = 20;
+  cube.position.z = -3;
+  cube.position.x = -2;
+  cube.castShadow = true;
+  cube.receiveShadow = true;
+  scene.add(cube);
+};
+
 // Singular function to initialize scene + rendering
 function init() {
   // Initialize scene
   scene = new THREE.Scene();
   scene.background = new THREE.Color( 0xcce0ff );
+
   // Add Fog
   // scene.fog = new THREE.Fog( 0xcce0ff, 10, 10000 );
 
@@ -27,13 +42,12 @@ function init() {
   light.shadow.mapSize.width = 1024;
   light.shadow.mapSize.height = 1024;
 
-  // Bad var name
-  let d = 300;
+  let distance = 300;
 
-  light.shadow.camera.left = - d;
-  light.shadow.camera.right = d;
-  light.shadow.camera.top = d;
-  light.shadow.camera.bottom = -d;
+  light.shadow.camera.left = - distance;
+  light.shadow.camera.right = distance;
+  light.shadow.camera.top = distance;
+  light.shadow.camera.bottom = -distance;
   light.shadow.camera.far = 1000;
 
   scene.add(light);
@@ -58,16 +72,8 @@ function init() {
   // Add controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  // Setup placeholder cube
-  const geometry = new THREE.BoxGeometry(4, 4, 4);
-  const material = new THREE.MeshPhongMaterial({color: 0x9e0018});
-  cube = new THREE.Mesh(geometry, material);
-  cube.position.y = 20;
-  cube.position.z = -3;
-  cube.position.x = -2;
-  scene.add(cube);
-  cube.castShadow = true;
-  cube.receiveShadow = true;
+  // Spawn initial cube
+  spawnCube();
 
   // Setup placeholder floor
   const floorGeometry = new THREE.BoxGeometry(100, 0.1, 100);
@@ -162,8 +168,14 @@ function animate() {
   cube.position.z += dxPerFrameZ;
 
   // If cube hits ground, stop
-  if(cube.position.y > 20) dxPerFrameY = -0.05;
-  if(cube.position.y <= 0) dxPerFrameY = 0;
+  if(cube.position.y > 20) {
+    dxPerFrameY = -0.05;
+  }
+  if(cube.position.y <= 0) {
+    dxPerFrameY = 0;
+    spawnCube();
+    dxPerFrameY = -0.05;
+  }
 
   // Render
   renderer.render(scene, camera);
