@@ -69,180 +69,47 @@ function init() {
   floorCube = new THREE.Mesh(floorGeometry, floorMaterial);
   floorCube.position.y = -1;
   scene.add(floorCube);
-  // DUMB Floor Grid
+
+  // Draw floor grid
   const lineMaterial = new THREE.MeshLambertMaterial({
     color: 0x000000,
     opacity: 1,
     transparent: true,
   });
-  let points = [];
-  points.push(new THREE.Vector3(0, 0, -21));
-  points.push(new THREE.Vector3(-20, 0, -21));
-  points.push(new THREE.Vector3(20, 0, -21));
-  let line = new THREE.BufferGeometry().setFromPoints(points);
-  let newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
 
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, -17));
-  points.push(new THREE.Vector3(20, 0, -17));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
+  // Draws a straight line with two sets of given vector coordinates
+  // Ex.: drawLine([,,], [,,]);
+  function drawLine() {
+    let points = [];
+    points.push(new THREE.Vector3(arguments[0][0], arguments[0][1], arguments[0][2]));
+    points.push(new THREE.Vector3(arguments[1][0], arguments[1][1], arguments[1][2]));
+    // console.log(points);
+    let line = new THREE.BufferGeometry().setFromPoints(points);
+    let newline = new THREE.Line(line, lineMaterial);
+    scene.add(newline);
+  }
 
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, -13));
-  points.push(new THREE.Vector3(20, 0, -13));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
+  // Draws a specified set of horizontal lines at a given start and unit step.
+  // Ex.: horizontalLines([St,ar,t], Step, Total)
+  function horizontalLines() {
+    let start = arguments[0][2];
+    for (let i = 0; i < arguments[2]; i += 1) {
+      drawLine([arguments[0][0], arguments[0][1], start], [-arguments[0][0], (arguments[0][1] + 1), start]);
+      start += arguments[1];
+    }
+  }
+  horizontalLines([-20, 0, -21], 4, 11);
 
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, -9));
-  points.push(new THREE.Vector3(20, 0, -9));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, -5));
-  points.push(new THREE.Vector3(20, 0, -5));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, -1));
-  points.push(new THREE.Vector3(20, 0, -1));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, 3));
-  points.push(new THREE.Vector3(20, 0, 3));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, 7));
-  points.push(new THREE.Vector3(20, 0, 7));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, 11));
-  points.push(new THREE.Vector3(20, 0, 11));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, 15));
-  points.push(new THREE.Vector3(20, 0, 15));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, 0, 19));
-  points.push(new THREE.Vector3(20, 0, 19));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  // vertical lines
-  points = [];
-  points.push(new THREE.Vector3(0, -1, 21));
-  points.push(new THREE.Vector3(0, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(4, -1, 21));
-  points.push(new THREE.Vector3(4, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-4, -1, 21));
-  points.push(new THREE.Vector3(-4, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-8, -1, 21));
-  points.push(new THREE.Vector3(-8, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(8, -1, 21));
-  points.push(new THREE.Vector3(8, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(12, -1, 21));
-  points.push(new THREE.Vector3(12, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-12, -1, 21));
-  points.push(new THREE.Vector3(-12, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(16, -1, 21));
-  points.push(new THREE.Vector3(16, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-16, -1, 21));
-  points.push(new THREE.Vector3(-16, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(20, -1, 21));
-  points.push(new THREE.Vector3(20, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  points = [];
-  points.push(new THREE.Vector3(-20, -1, 21));
-  points.push(new THREE.Vector3(-20, 0, -21));
-  line = new THREE.BufferGeometry().setFromPoints(points);
-  newline = new THREE.Line(line, lineMaterial);
-  scene.add(newline);
-
-  // function makeLine(array) {
-  //   let points = [];
-  //   console.log(array[0]);
-  //   console.log(array[0], array[1], array[2]);
-  //   points.push(new THREE.Vector3(array[0], array[1], array[2]));
-  //   console.log(points[0]);
-  //   let line = new THREE.BufferGeometry().setFromPoints(points[0]);
-  //   let newline = new THREE.Line(line, lineMaterial);
-  //   scene.add(newline);
-  // }
-
-  // makeLine([-21, 21, 0]);
+  // Draws a specified set of vertical lines at a given start and unit step.
+  // Ex.: horizontalLines([St,ar,t], Step, Total)
+  function verticalLines() {
+    let start = arguments[0][0];
+    for (let i = 0; i < arguments[2]; i += 1) {
+      drawLine([start, arguments[0][1], arguments[0][2]], [start, (arguments[0][1] + 1), -arguments[0][2]]);
+      start += arguments[1];
+    }
+  }
+  verticalLines([-20, -1, 21], 4, 11);
 
   // Setup placeholder walls
   const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
