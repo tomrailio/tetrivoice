@@ -1,4 +1,5 @@
 /* eslint-disable require-jsdoc */
+const gridSize = 4;
 let scene;
 let camera;
 let renderer;
@@ -12,7 +13,7 @@ let dxPerFrameZ = 0;
 // Spawn cube function
 // Expand to handle all blocks.
 function spawnCube() {
-  const geometry = new THREE.BoxGeometry(4, 4, 4);
+  const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
   const material = new THREE.MeshPhongMaterial({color: 0x9e0018});
   cube = new THREE.Mesh(geometry, material);
   cube.position.y = 20;
@@ -37,13 +38,10 @@ function init() {
   let light = new THREE.DirectionalLight (0xdfebff, 1);
   light.position.set(0,50,0);
   light.position.multiplyScalar(1.3);
-
   light.castShadow = true;
   light.shadow.mapSize.width = 1024;
   light.shadow.mapSize.height = 1024;
-
   let distance = 300;
-
   light.shadow.camera.left = - distance;
   light.shadow.camera.right = distance;
   light.shadow.camera.top = distance;
@@ -111,7 +109,7 @@ function init() {
       start += arguments[1];
     }
   }
-  horizontalLines([-20, 0, -21], 4, 11);
+  horizontalLines([-20, 0, -21], gridSize, 11);
 
   // Draws a specified set of vertical lines at a given start and unit step.
   // Ex.: verticalLines([St,ar,t], Step, Total)
@@ -122,7 +120,7 @@ function init() {
       start += arguments[1];
     }
   }
-  verticalLines([-20, 0, 21], 4, 11);
+  verticalLines([-20, 0, 21], gridSize, 11);
 
   // Setup placeholder walls
   const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
@@ -205,32 +203,32 @@ function onDocumentKeyDown(event) {
     console.log("space down")
   }
   else if (keyCode == 68) {
-    if(cube.position.x <= 20 && dxPerFrameY < 0) {
-      dxPerFrameX = 0.1;
+    if(cube.position.x <= 16 && dxPerFrameY < 0) {
+      cube.position.x += gridSize
     } else {
       dxPerFrameX = 0;
     }
     console.log("d down")
   }
   else if (keyCode == 65) {
-    if(cube.position.x >= -20 && dxPerFrameY < 0) {
-      dxPerFrameX = -0.1;
+    if(cube.position.x >= -16 && dxPerFrameY < 0) {
+      cube.position.x -= gridSize
     } else {
       dxPerFrameX = 0;
     }
     console.log("a down")
   }
   else if (keyCode == 87) {
-    if(cube.position.z >= -20 && dxPerFrameY < 0) {
-      dxPerFrameZ = -0.1
+    if(cube.position.z >= -16 && dxPerFrameY < 0) {
+      cube.position.z -= gridSize
     } else {
       dxPerFrameZ = 0;
     }
     console.log("w down")
   }
   else if (keyCode == 83) {
-    if(cube.position.z <= 20 && dxPerFrameY < 0) {
-      dxPerFrameZ = 0.1;
+    if(cube.position.z <= 16 && dxPerFrameY < 0) {
+      cube.position.z += gridSize
     } else {
       dxPerFrameZ = 0;
     }
