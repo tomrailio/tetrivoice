@@ -3,7 +3,6 @@ const gridSize = 4;
 let scene;
 let camera;
 let renderer;
-// let cube;
 let floorCube;
 let longPiece;
 // Cube animation vars
@@ -35,36 +34,77 @@ let dxPerFrameZ = 0;
 // };
 
 function spawnPiece() {
-  const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-  const material = new THREE.MeshToonMaterial({color: 0x9e0018});
-  let cube = new THREE.Mesh(geometry, material);
-  cube.position.set(0, 0, -4);
-  cube.castShadow = true;
-  cube.receiveShadow = true;
-  cube.updateMatrix();
+  // Long piece
+  function spawnLongPiece() {
+    const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    const material = new THREE.MeshToonMaterial({color: 0x9e0018});
+    let cube = new THREE.Mesh(geometry, material);
+    cube.position.set(0, 0, -4);
+    cube.castShadow = true;
+    cube.receiveShadow = true;
+    cube.updateMatrix();
 
-  let cube2 = new THREE.Mesh(geometry, material);
-  cube2.position.set(0, 0, -8);
-  cube2.castShadow = true;
-  cube2.receiveShadow = true;
-  cube2.updateMatrix();
+    let cube2 = new THREE.Mesh(geometry, material);
+    cube2.position.set(0, 0, -8);
+    cube2.castShadow = true;
+    cube2.receiveShadow = true;
+    cube2.updateMatrix();
 
-  let cube3 = new THREE.Mesh(geometry, material);
-  cube3.position.set(0, 0, -12);
-  cube3.castShadow = true;
-  cube3.receiveShadow = true;
-  cube3.updateMatrix();
+    let cube3 = new THREE.Mesh(geometry, material);
+    cube3.position.set(0, 0, -12);
+    cube3.castShadow = true;
+    cube3.receiveShadow = true;
+    cube3.updateMatrix();
 
-  let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-  cube4.merge(cube.geometry, cube.matrix)
-  cube4.merge(cube2.geometry, cube2.matrix)
-  cube4.merge(cube3.geometry, cube3.matrix)
+    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix)
+    cube4.merge(cube2.geometry, cube2.matrix)
+    cube4.merge(cube3.geometry, cube3.matrix)
 
-  longPiece = new THREE.Mesh(cube4, material)
-  longPiece.castShadow = true;
-  longPiece.receiveShadow = true;
-  scene.add(longPiece);
-  longPiece.position.set(-2, 20, 1);
+    longPiece = new THREE.Mesh(cube4, material)
+    longPiece.castShadow = true;
+    longPiece.receiveShadow = true;
+    scene.add(longPiece);
+    longPiece.position.set(-2, 20, 1);
+  }
+
+  function spawnTPiece() {
+    const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    const material = new THREE.MeshToonMaterial({color: 0x9e0018});
+    let cube = new THREE.Mesh(geometry, material);
+    cube.position.set(0, 0, -4);
+    cube.castShadow = true;
+    cube.receiveShadow = true;
+    cube.updateMatrix();
+
+    let cube2 = new THREE.Mesh(geometry, material);
+    cube2.position.set(0, 0, -8);
+    cube2.castShadow = true;
+    cube2.receiveShadow = true;
+    cube2.updateMatrix();
+
+    let cube3 = new THREE.Mesh(geometry, material);
+    cube3.position.set(4, 0, -4);
+    cube3.castShadow = true;
+    cube3.receiveShadow = true;
+    cube3.updateMatrix();
+
+    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix)
+    cube4.merge(cube2.geometry, cube2.matrix)
+    cube4.merge(cube3.geometry, cube3.matrix)
+
+    longPiece = new THREE.Mesh(cube4, material)
+    longPiece.castShadow = true;
+    longPiece.receiveShadow = true;
+    scene.add(longPiece);
+    longPiece.position.set(-2, 20, 1);
+  }
+
+  // Spawn pieces randomly
+  let pieces = [spawnLongPiece, spawnTPiece,];
+  pieces[Math.floor((Math.random() * pieces.length))]();
+  console.log(pieces[Math.floor((Math.random() * pieces.length))]);
 }
 
 // Singular function to initialize scene + rendering
