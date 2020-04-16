@@ -11,6 +11,7 @@ let dxPerFrameY = 1;
 let dxPerFrameZ = 0;
 
 // Spawn tetrominoes
+// TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
   // Long piece
   function spawnIPiece() {
@@ -445,6 +446,7 @@ window.addEventListener('resize', onWindowResize, false);
 document.addEventListener('keydown', onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
   let keyCode = event.which;
+  // Movement
   if (keyCode == 32) {
     // Move cube faster if spacebar held down
     if(currentPiece.position.y <= 0) {
@@ -491,7 +493,37 @@ function onDocumentKeyDown(event) {
     dxPerFrameY = -0.05;
     console.log("r down")
   }
+  // Rotation
+  else if (keyCode == 81) {
+    if (dxPerFrameY < 0) {
+      currentPiece.rotation.y += Math.PI / 2;
+      // rotatePiece(left);
+    }
+    console.log("q down")
+  }
+  else if (keyCode == 69) {
+    if (dxPerFrameY < 0) {
+      currentPiece.rotation.y += Math.PI / -2;
+    }
+    console.log("e down")
+  };
 };
+
+
+// var geom = new THREE.BoxGeometry(0.1, 0.1, 1);
+// geom.translate(0, 0, 0.5);
+// var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({color: "aqua", wireframe: true}));
+// scene.add(mesh);
+
+// render();
+
+// function render() {
+//   requestAnimationFrame(render);
+//   mesh.rotation.y += 0.01;
+//   angle.innerHTML = THREE.Math.radToDeg(mesh.rotation.y) % 360;
+//   renderer.render(scene, camera);
+// }
+
 
 document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
