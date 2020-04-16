@@ -24,41 +24,6 @@ const voiceCommands = [
   'drop',
 ];
 
-function startVoice() {
-  const main = document.getElementsByTagName('body')[0];
-  // const result = document.getElementById('text');
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (typeof SpeechRecognition !== 'undefined') {
-    const recognition = new SpeechRecognition();
-    main.classList.add('speaking');
-    recognition.start();
-
-    const onResult = (event) => {
-      for (const res of event.results) {
-        // const text = document.createTextNode(res[0].transcript);
-        // result.appendChild(text);
-        if (res.isFinal) {
-          main.classList.add('final');
-        }
-        console.log(event.results);
-        console.log(res[0].transcript);
-        if (res[0].transcript == voiceCommands[0]) {
-          if (dxPerFrameY < 0) {
-            currentPiece.rotation.y += Math.PI / 2;
-          }
-        } else {
-          console.log('No voice commands recognized');
-        };
-      }
-    };
-
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.addEventListener('result', onResult);
-  }
-};
-
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
@@ -616,6 +581,54 @@ function onDocumentKeyUp(event) {
   }
 };
 
-init();
-animate();
-startVoice();
+window.addEventListener('DOMContentLoaded', () => {
+  const button = document.getElementById("button");
+  const main = document.getElementsByTagName("main")[0];
+  let listening = false;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (typeof SpeechRecognition !== "undefined") {
+    const recognition = new SpeechRecognition();
+
+    const stop = () => {
+      main.classList.remove("speaking");
+      recognition.stop();
+      button.textContent = "Start playing";
+    };
+
+    const start = () => {
+      main.classList.add("speaking");
+      recognition.start();
+      button.textContent = "Stop listening";
+      init();
+      animate();
+    };
+
+    const onResult = (event) => {
+      for (const res of event.results) {
+        const text = document.createTextNode(res[0].transcript);
+        console.log(res[0].transcript);
+        console.log(event.results)
+        if (res[0].transcript == voiceCommands[0]) {
+          if (dxPerFrameY < 0) {
+            currentPiece.rotation.y += Math.PI / 2;
+          }
+        } else {
+          console.log('No voice commands recognized');
+        };
+      }
+    };
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.addEventListener("result", onResult);
+    button.addEventListener("click", event => {
+      listening ? stop() : start();
+      listening = !listening;
+    });
+  } else {
+    button.remove();
+    const message = document.getElementById("message");
+    message.removeAttribute("hidden");
+    message.setAttribute("aria-hidden", "false");
+  }
+});
