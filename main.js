@@ -3,8 +3,9 @@ const gridSize = 4;
 let scene;
 let camera;
 let renderer;
-let cube;
+// let cube;
 let floorCube;
+let longPiece;
 // Cube animation vars
 let dxPerFrameX = 0;
 let dxPerFrameY = 1;
@@ -12,17 +13,59 @@ let dxPerFrameZ = 0;
 
 // Spawn cube function
 // Expand to handle all blocks.
-function spawnCube() {
+// function spawnCube() {
+//   const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+//   const material = new THREE.MeshPhongMaterial({color: 0x9e0018});
+//   cube = new THREE.Mesh(geometry, material);
+
+//   let ballGeo = new THREE.SphereGeometry(4,4,4);
+
+//   cube.updateMatrix();
+//   ballGeo.merge(cube.geometry, cube.matrix);
+
+//   let ballcube = new THREE.Mesh(ballGeo, material)
+//   scene.add(ballcube)
+
+//   cube.position.y = 20;
+//   cube.position.z = -3;
+//   cube.position.x = -2;
+//   cube.castShadow = true;
+//   cube.receiveShadow = true;
+//   //scene.add(cube);
+// };
+
+function spawnPiece() {
   const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-  const material = new THREE.MeshPhongMaterial({color: 0x9e0018});
-  cube = new THREE.Mesh(geometry, material);
-  cube.position.y = 20;
-  cube.position.z = -3;
-  cube.position.x = -2;
+  const material = new THREE.MeshToonMaterial({color: 0x9e0018});
+  let cube = new THREE.Mesh(geometry, material);
+  cube.position.set(0, 0, -4);
   cube.castShadow = true;
   cube.receiveShadow = true;
-  scene.add(cube);
-};
+  cube.updateMatrix();
+
+  let cube2 = new THREE.Mesh(geometry, material);
+  cube2.position.set(0, 0, -8);
+  cube2.castShadow = true;
+  cube2.receiveShadow = true;
+  cube2.updateMatrix();
+
+  let cube3 = new THREE.Mesh(geometry, material);
+  cube3.position.set(0, 0, -12);
+  cube3.castShadow = true;
+  cube3.receiveShadow = true;
+  cube3.updateMatrix();
+
+  let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+  cube4.merge(cube.geometry, cube.matrix)
+  cube4.merge(cube2.geometry, cube2.matrix)
+  cube4.merge(cube3.geometry, cube3.matrix)
+
+  longPiece = new THREE.Mesh(cube4, material)
+  longPiece.castShadow = true;
+  longPiece.receiveShadow = true;
+  scene.add(longPiece);
+  longPiece.position.set(-2, 20, 1);
+}
 
 // Singular function to initialize scene + rendering
 function init() {
@@ -71,7 +114,8 @@ function init() {
   controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   // Spawn initial cube
-  spawnCube();
+  //spawnCube();
+  spawnPiece();
 
   // Setup placeholder floor
   const floorGeometry = new THREE.BoxGeometry(100, 0.1, 100);
@@ -161,17 +205,17 @@ function animate() {
   requestAnimationFrame(animate);
 
   // Move cube
-  cube.position.x += dxPerFrameX;
-  cube.position.y += dxPerFrameY;
-  cube.position.z += dxPerFrameZ;
+  longPiece.position.x += dxPerFrameX;
+  longPiece.position.y += dxPerFrameY;
+  longPiece.position.z += dxPerFrameZ;
 
   // If cube hits ground, stop
-  if(cube.position.y > 20) {
+  if(longPiece.position.y > 20) {
     dxPerFrameY = -0.05;
   }
-  if(cube.position.y <= 0) {
+  if(longPiece.position.y <= 0) {
     dxPerFrameY = 0;
-    spawnCube();
+    spawnPiece();
     dxPerFrameY = -0.05;
   }
 
@@ -195,7 +239,7 @@ function onDocumentKeyDown(event) {
   let keyCode = event.which;
   if (keyCode == 32) {
     // Move cube faster if spacebar held down
-    if(cube.position.y <= 0) {
+    if(longPiece.position.y <= 0) {
       dxPerFrameY = 0;
     } else {
       dxPerFrameY = -0.2;
@@ -203,39 +247,39 @@ function onDocumentKeyDown(event) {
     console.log("space down")
   }
   else if (keyCode == 68) {
-    if(cube.position.x <= 16 && dxPerFrameY < 0) {
-      cube.position.x += gridSize
+    if(longPiece.position.x <= 16 && dxPerFrameY < 0) {
+      longPiece.position.x += gridSize
     } else {
       dxPerFrameX = 0;
     }
     console.log("d down")
   }
   else if (keyCode == 65) {
-    if(cube.position.x >= -16 && dxPerFrameY < 0) {
-      cube.position.x -= gridSize
+    if(longPiece.position.x >= -16 && dxPerFrameY < 0) {
+      longPiece.position.x -= gridSize
     } else {
       dxPerFrameX = 0;
     }
     console.log("a down")
   }
   else if (keyCode == 87) {
-    if(cube.position.z >= -16 && dxPerFrameY < 0) {
-      cube.position.z -= gridSize
+    if(longPiece.position.z >= -16 && dxPerFrameY < 0) {
+      longPiece.position.z -= gridSize
     } else {
       dxPerFrameZ = 0;
     }
     console.log("w down")
   }
   else if (keyCode == 83) {
-    if(cube.position.z <= 16 && dxPerFrameY < 0) {
-      cube.position.z += gridSize
+    if(longPiece.position.z <= 16 && dxPerFrameY < 0) {
+      longPiece.position.z += gridSize
     } else {
       dxPerFrameZ = 0;
     }
     console.log("s down");
   }
   else if (keyCode == 82) {
-    cube.position.y = 20;
+    longPiece.position.y = 20;
     dxPerFrameY = -0.05;
     console.log("r down")
   }
@@ -245,7 +289,7 @@ document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
   let keyCode = event.which;
   if (keyCode == 32) {
-    if (cube.position.y <= 0) {
+    if (longPiece.position.y <= 0) {
       dxPerFrameY = 0;
     } else {
       dxPerFrameY = -0.05;
