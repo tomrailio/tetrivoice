@@ -68,6 +68,7 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
+    // For making cube...unsure about keeping
     let cube4 = new THREE.Mesh(geometry, material);
     cube4.position.set(0, 4, -4);
     cube4.castShadow = true;
@@ -452,14 +453,22 @@ function onDocumentKeyDown(event) {
     if(currentPiece.position.y <= 0) {
       dxPerFrameY = 0;
     } else {
-      dxPerFrameY = -0.2;
+      dxPerFrameY = -0.3;
     }
     console.log("space down")
-  }
-  else if (keyCode == 68) {
-    if(currentPiece.position.x <= 16 && dxPerFrameY < 0) {
-      currentPiece.position.x += gridSize
-    } else {
+  } else if (keyCode == 68) {
+    let pieceVector = new THREE.Vector3();
+    pieceVector.setFromMatrixPosition( currentPiece.matrixWorld ).max;
+    let rightWallVector = new THREE.Vector3();
+    rightWallVector.setFromMatrixPosition( rightWallCube.matrixWorld );
+
+    if (pieceVector.x < rightWallVector.x && dxPerFrameY < 0) {
+      let close = rightWallVector.x - pieceVector.x
+      if (gridSize < close) {
+        currentPiece.position.x += gridSize;
+      }
+    }
+    else {
       dxPerFrameX = 0;
     }
     console.log("d down")
@@ -497,7 +506,6 @@ function onDocumentKeyDown(event) {
   else if (keyCode == 81) {
     if (dxPerFrameY < 0) {
       currentPiece.rotation.y += Math.PI / 2;
-      // rotatePiece(left);
     }
     console.log("q down")
   }
@@ -508,22 +516,6 @@ function onDocumentKeyDown(event) {
     console.log("e down")
   };
 };
-
-
-// var geom = new THREE.BoxGeometry(0.1, 0.1, 1);
-// geom.translate(0, 0, 0.5);
-// var mesh = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({color: "aqua", wireframe: true}));
-// scene.add(mesh);
-
-// render();
-
-// function render() {
-//   requestAnimationFrame(render);
-//   mesh.rotation.y += 0.01;
-//   angle.innerHTML = THREE.Math.radToDeg(mesh.rotation.y) % 360;
-//   renderer.render(scene, camera);
-// }
-
 
 document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
@@ -553,6 +545,39 @@ function onDocumentKeyUp(event) {
     console.log("s up");
   }
 };
+
+window.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("button");
+  const result = document.getElementById("result");
+  const main = document.getElementsByTagName("main")[0];
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (typeof SpeechRecognition !== "undefined") {
+    const recognition = new SpeechRecognition();
+
+    recognition.start();
+
+    const onResult = event => {
+      for (const res of event.results) {
+        console.log(res[0].transcript);
+        if (res[0].transcript == 'rotate') {
+          if (dxPerFrameY < 0) {
+            currentPiece.rotation.y += Math.PI / 2;
+          }
+        }
+        else {
+          console.log("no rotating");
+        }
+      }
+    };
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.addEventListener("result", onResult);
+  } else {
+    const message = document.getElementById("message");
+    message.removeAttribute("hidden");
+    message.setAttribute("aria-hidden", "false");
+  }
+});
 
 init();
 animate();
