@@ -1,3 +1,6 @@
+/* eslint-disable indent */
+/* eslint-disable prefer-rest-params */
+/* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
 const gridSize = 4;
 let scene;
@@ -63,30 +66,30 @@ function spawnPiece() {
   function spawnIPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x00eaff});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(0, 0, -12);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix)
-    cube4.merge(cube2.geometry, cube2.matrix)
-    cube4.merge(cube3.geometry, cube3.matrix)
+    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix);
+    cube4.merge(cube2.geometry, cube2.matrix);
+    cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material)
+    currentPiece = new THREE.Mesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -96,57 +99,57 @@ function spawnPiece() {
   function spawnOPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xffe100});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(-4, 0, -4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(-4, 0, 0);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
     // For making cube...unsure about keeping
-    let cube4 = new THREE.Mesh(geometry, material);
+    const cube4 = new THREE.Mesh(geometry, material);
     cube4.position.set(0, 4, -4);
     cube4.castShadow = true;
     cube4.receiveShadow = true;
     cube4.updateMatrix();
-  
-    let cube5 = new THREE.Mesh(geometry, material);
+
+    const cube5 = new THREE.Mesh(geometry, material);
     cube5.position.set(-4, 4, 0);
     cube5.updateMatrix();
-  
-    let cube6 = new THREE.Mesh(geometry, material);
+
+    const cube6 = new THREE.Mesh(geometry, material);
     cube6.position.set(-4, 4, -4);
     cube6.castShadow = true;
     cube6.receiveShadow = true;
     cube6.updateMatrix();
-  
-    let cube7 = new THREE.Mesh(geometry, material);
+
+    const cube7 = new THREE.Mesh(geometry, material);
     cube7.position.set(0, 4, 0);
     cube7.castShadow = true;
     cube7.receiveShadow = true;
     cube7.updateMatrix();
-  
-    let cube8 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube8.merge(cube.geometry, cube.matrix)
-    cube8.merge(cube2.geometry, cube2.matrix)
-    cube8.merge(cube3.geometry, cube3.matrix)
-    cube8.merge(cube.geometry, cube4.matrix)
-    cube8.merge(cube2.geometry, cube5.matrix)
-    cube8.merge(cube3.geometry, cube6.matrix)
-    cube8.merge(cube.geometry, cube7.matrix)
 
-    currentPiece = new THREE.Mesh(cube8, material)
+    const cube8 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube8.merge(cube.geometry, cube.matrix);
+    cube8.merge(cube2.geometry, cube2.matrix);
+    cube8.merge(cube3.geometry, cube3.matrix);
+    cube8.merge(cube.geometry, cube4.matrix);
+    cube8.merge(cube2.geometry, cube5.matrix);
+    cube8.merge(cube3.geometry, cube6.matrix);
+    cube8.merge(cube.geometry, cube7.matrix);
+
+    currentPiece = new THREE.Mesh(cube8, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -156,30 +159,30 @@ function spawnPiece() {
   function spawnTPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x6d2e8c});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix)
-    cube4.merge(cube2.geometry, cube2.matrix)
-    cube4.merge(cube3.geometry, cube3.matrix)
+    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix);
+    cube4.merge(cube2.geometry, cube2.matrix);
+    cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material)
+    currentPiece = new THREE.Mesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -189,30 +192,30 @@ function spawnPiece() {
   function spawnSPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x37b027});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(-4, 0, 0);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, 4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(-4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix)
-    cube4.merge(cube2.geometry, cube2.matrix)
-    cube4.merge(cube3.geometry, cube3.matrix)
+    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix);
+    cube4.merge(cube2.geometry, cube2.matrix);
+    cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material)
+    currentPiece = new THREE.Mesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -222,30 +225,30 @@ function spawnPiece() {
   function spawnZPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xc71414});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(4, 0, 0);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, 4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix)
-    cube4.merge(cube2.geometry, cube2.matrix)
-    cube4.merge(cube3.geometry, cube3.matrix)
+    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix);
+    cube4.merge(cube2.geometry, cube2.matrix);
+    cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material)
+    currentPiece = new THREE.Mesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -255,30 +258,30 @@ function spawnPiece() {
   function spawnJPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x19308c});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, -8);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix)
-    cube4.merge(cube2.geometry, cube2.matrix)
-    cube4.merge(cube3.geometry, cube3.matrix)
+    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix);
+    cube4.merge(cube2.geometry, cube2.matrix);
+    cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material)
+    currentPiece = new THREE.Mesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -288,30 +291,30 @@ function spawnPiece() {
   function spawnLPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xde7a10});
-    let cube = new THREE.Mesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    let cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    let cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, 0);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    let cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix)
-    cube4.merge(cube2.geometry, cube2.matrix)
-    cube4.merge(cube3.geometry, cube3.matrix)
+    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
+    cube4.merge(cube.geometry, cube.matrix);
+    cube4.merge(cube2.geometry, cube2.matrix);
+    cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material)
+    currentPiece = new THREE.Mesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -319,7 +322,15 @@ function spawnPiece() {
   }
 
   // Spawn pieces randomly
-  let pieces = [spawnIPiece, spawnOPiece, spawnTPiece, spawnSPiece, spawnZPiece, spawnJPiece, spawnLPiece];
+  const pieces = [
+    spawnIPiece,
+    spawnOPiece,
+    spawnTPiece,
+    spawnSPiece,
+    spawnZPiece,
+    spawnJPiece,
+    spawnLPiece,
+  ];
   pieces[Math.floor((Math.random() * pieces.length))]();
 }
 
@@ -333,14 +344,14 @@ function init() {
   // scene.fog = new THREE.Fog( 0xcce0ff, 10, 10000 );
 
   // Lights
-  scene.add( new THREE.AmbientLight ( 0x666666 ));
-  let light = new THREE.DirectionalLight (0xdfebff, 1);
-  light.position.set(0,50,0);
+  scene.add( new THREE.AmbientLight( 0x666666 ));
+  const light = new THREE.DirectionalLight(0xdfebff, 1);
+  light.position.set(0, 50, 0);
   light.position.multiplyScalar(1.3);
   light.castShadow = true;
   light.shadow.mapSize.width = 1024;
   light.shadow.mapSize.height = 1024;
-  let distance = 300;
+  const distance = 300;
   light.shadow.camera.left = - distance;
   light.shadow.camera.right = distance;
   light.shadow.camera.top = distance;
@@ -351,10 +362,10 @@ function init() {
 
   // Setup perspective cameras
   camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
   );
   camera.position.z = 50;
   camera.position.y = 100;
@@ -370,7 +381,7 @@ function init() {
   controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   // Spawn initial cube
-  //spawnCube();
+  // spawnCube();
   spawnPiece();
 
   // Setup placeholder floor
@@ -391,12 +402,19 @@ function init() {
   // Draws a straight line with two sets of given vector coordinates
   // Ex.: drawLine([,,], [,,]);
   function drawLine() {
-    let points = [];
-    points.push(new THREE.Vector3(arguments[0][0], arguments[0][1], arguments[0][2]));
-    points.push(new THREE.Vector3(arguments[1][0], arguments[1][1], arguments[1][2]));
-    // console.log(points);
-    let line = new THREE.BufferGeometry().setFromPoints(points);
-    let newline = new THREE.Line(line, lineMaterial);
+    const points = [];
+    points.push(new THREE.Vector3(
+      arguments[0][0],
+      arguments[0][1],
+      arguments[0][2],
+    ));
+    points.push(new THREE.Vector3(
+      arguments[1][0],
+      arguments[1][1],
+      arguments[1][2],
+    ));
+    const line = new THREE.BufferGeometry().setFromPoints(points);
+    const newline = new THREE.Line(line, lineMaterial);
     scene.add(newline);
   }
 
@@ -405,7 +423,10 @@ function init() {
   function horizontalLines() {
     let start = arguments[0][2];
     for (let i = 0; i < arguments[2]; i += 1) {
-      drawLine([arguments[0][0], arguments[0][1], start], [-arguments[0][0], arguments[0][1], start]);
+      drawLine(
+        [arguments[0][0], arguments[0][1], start],
+        [-arguments[0][0], arguments[0][1], start],
+      );
       start += arguments[1];
     }
   }
@@ -416,7 +437,10 @@ function init() {
   function verticalLines() {
     let start = arguments[0][0];
     for (let i = 0; i < arguments[2]; i += 1) {
-      drawLine([start, arguments[0][1], arguments[0][2]], [start, arguments[0][1], -arguments[0][2]]);
+      drawLine(
+        [start, arguments[0][1], arguments[0][2]],
+        [start, arguments[0][1], -arguments[0][2]],
+      );
       start += arguments[1];
     }
   }
@@ -492,24 +516,24 @@ window.addEventListener('resize', onWindowResize, false);
 // Listen for keyboard input
 document.addEventListener('keydown', onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
-  let keyCode = event.which;
+  const keyCode = event.which;
   // Movement
   if (keyCode == 32) {
     // Move cube faster if spacebar held down
-    if(currentPiece.position.y <= 0) {
+    if (currentPiece.position.y <= 0) {
       dxPerFrameY = 0;
     } else {
       dxPerFrameY = -0.3;
     }
-    console.log("space down")
+    console.log('space down');
   } else if (keyCode == 68) {
-    let pieceVector = new THREE.Vector3();
+    const pieceVector = new THREE.Vector3();
     pieceVector.setFromMatrixPosition( currentPiece.matrixWorld ).max;
-    let rightWallVector = new THREE.Vector3();
+    const rightWallVector = new THREE.Vector3();
     rightWallVector.setFromMatrixPosition( rightWallCube.matrixWorld );
 
     if (pieceVector.x < rightWallVector.x && dxPerFrameY < 0) {
-      let close = rightWallVector.x - pieceVector.x
+      const close = rightWallVector.x - pieceVector.x;
       if (gridSize < close) {
         currentPiece.position.x += gridSize;
       }
@@ -517,78 +541,78 @@ function onDocumentKeyDown(event) {
     else {
       dxPerFrameX = 0;
     }
-    console.log("d down")
+    console.log('d down');
   }
   else if (keyCode == 65) {
-    if(currentPiece.position.x >= -16 && dxPerFrameY < 0) {
-      currentPiece.position.x -= gridSize
+    if (currentPiece.position.x >= -16 && dxPerFrameY < 0) {
+      currentPiece.position.x -= gridSize;
     } else {
       dxPerFrameX = 0;
     }
-    console.log("a down")
+    console.log('a down');
   }
   else if (keyCode == 87) {
-    if(currentPiece.position.z >= -16 && dxPerFrameY < 0) {
-      currentPiece.position.z -= gridSize
+    if (currentPiece.position.z >= -16 && dxPerFrameY < 0) {
+      currentPiece.position.z -= gridSize;
     } else {
       dxPerFrameZ = 0;
     }
-    console.log("w down")
+    console.log('w down');
   }
   else if (keyCode == 83) {
-    if(currentPiece.position.z <= 16 && dxPerFrameY < 0) {
-      currentPiece.position.z += gridSize
+    if (currentPiece.position.z <= 16 && dxPerFrameY < 0) {
+      currentPiece.position.z += gridSize;
     } else {
       dxPerFrameZ = 0;
     }
-    console.log("s down");
+    console.log('s down');
   }
   else if (keyCode == 82) {
     currentPiece.position.y = 20;
     dxPerFrameY = -0.05;
-    console.log("r down")
+    console.log('r down');
   }
   // Rotation
   else if (keyCode == 81) {
     if (dxPerFrameY < 0) {
       currentPiece.rotation.y += Math.PI / 2;
     }
-    console.log("q down")
+    console.log('q down');
   }
   else if (keyCode == 69) {
     if (dxPerFrameY < 0) {
       currentPiece.rotation.y += Math.PI / -2;
     }
-    console.log("e down")
+    console.log('e down');
   };
 };
 
 document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
-  let keyCode = event.which;
+  const keyCode = event.which;
   if (keyCode == 32) {
     if (currentPiece.position.y <= 0) {
       dxPerFrameY = 0;
     } else {
       dxPerFrameY = -0.05;
     }
-    console.log("space up");
+    console.log('space up');
   }
   else if (keyCode == 68) {
     dxPerFrameX = 0;
-    console.log("d up");
+    console.log('d up');
   }
   else if (keyCode == 65) {
     dxPerFrameX = 0;
-    console.log("a up");
+    console.log('a up');
   }
   else if (keyCode == 87) {
     dxPerFrameZ = 0;
-    console.log("w up");
+    console.log('w up');
   }
   else if (keyCode == 83) {
     dxPerFrameZ = 0;
-    console.log("s up");
+    console.log('s up');
   }
 };
 
