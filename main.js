@@ -9,6 +9,8 @@ let currentPiece;
 let dxPerFrameX = 0;
 let dxPerFrameY = 1;
 let dxPerFrameZ = 0;
+// voice Recognition
+const voiceCommands = ['rotate', 'rotate right', 'rotate left', 'move left', 'move right', 'move up', 'move down', 'drop'];
 
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
@@ -547,35 +549,31 @@ function onDocumentKeyUp(event) {
 };
 
 window.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("button");
-  const result = document.getElementById("result");
-  const main = document.getElementsByTagName("main")[0];
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (typeof SpeechRecognition !== "undefined") {
     const recognition = new SpeechRecognition();
-
     recognition.start();
 
     const onResult = event => {
+      console.log(event.results);
       for (const res of event.results) {
         console.log(res[0].transcript);
-        if (res[0].transcript == 'rotate') {
+        if (res[0].transcript == voiceCommands[0]) {
           if (dxPerFrameY < 0) {
             currentPiece.rotation.y += Math.PI / 2;
           }
         }
         else {
-          console.log("no rotating");
+          console.log("No voice commands recognized");
         }
       }
     };
-    recognition.continuous = true;
+
+    recognition.continuous = false;
     recognition.interimResults = true;
     recognition.addEventListener("result", onResult);
   } else {
-    const message = document.getElementById("message");
-    message.removeAttribute("hidden");
-    message.setAttribute("aria-hidden", "false");
+    console.log("Web Speech API not available for this browser.")
   }
 });
 
