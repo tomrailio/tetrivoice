@@ -319,6 +319,7 @@ function init() {
 
   // Add controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enabled = false;
 
   // Spawn initial piece
   spawnPiece();
@@ -444,12 +445,9 @@ function onDocumentKeyDown(event) {
   const keyCode = event.which;
   // Movement
   if (keyCode == 32) {
-    // Move cube faster if spacebar held down
-    if (currentPiece.position.y <= 0) {
-      dxPerFrameY = 0;
-    } else {
-      dxPerFrameY = -0.3;
-    }
+    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
+    currentPiece.setLinearVelocity(playerVec3);
     console.log('space down');
   } else if (keyCode == 68) {
       let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
@@ -478,15 +476,15 @@ function onDocumentKeyDown(event) {
   }
   // Rotation
   else if (keyCode == 81) {
-    if (dxPerFrameY < 0) {
-      currentPiece.rotation.y += Math.PI / 2;
-    }
+    // if (dxPerFrameY < 0) {
+    //   currentPiece.rotation.y += Math.PI / 2;
+    // }
     console.log('q down');
   }
   else if (keyCode == 69) {
-    if (dxPerFrameY < 0) {
-      currentPiece.rotation.y += Math.PI / -2;
-    }
+    // if (dxPerFrameY < 0) {
+    //   currentPiece.rotation.y += Math.PI / -2;
+    // }
     console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
@@ -497,11 +495,9 @@ document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
   const keyCode = event.which;
   if (keyCode == 32) {
-    if (currentPiece.position.y <= 0) {
-      dxPerFrameY = 0;
-    } else {
-      dxPerFrameY = -0.05;
-    }
+    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + -oldVector.y, oldVector.z);
+    currentPiece.setLinearVelocity(playerVec3);
     console.log('space up');
   }
   else if (keyCode == 68) {
