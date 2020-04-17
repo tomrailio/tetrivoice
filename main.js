@@ -2,6 +2,10 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
+
+Physijs.scripts.worker = './js/physijs_worker.js';
+Physijs.scripts.ammo = './ammo.js';
+
 const gridSize = 4;
 let scene;
 let camera;
@@ -13,17 +17,6 @@ let dxPerFrameX = 0;
 let dxPerFrameY = 1;
 let dxPerFrameZ = 0;
 // voice Recognition
-// const voiceCommands = [
-//   'rotate',
-//   'rotate right',
-//   'rotate left',
-//   'move left',
-//   'move right',
-//   'move up',
-//   'move down',
-//   'drop',
-// ];
-
 const voiceCommands = [
   'rotate',
   'rotate right',
@@ -42,189 +35,194 @@ function spawnPiece() {
   function spawnIPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x00eaff});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(0, 0, -12);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix);
-    cube4.merge(cube2.geometry, cube2.matrix);
-    cube4.merge(cube3.geometry, cube3.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece.add(cube, cube2, cube3)
+    // cube4.merge(cube.geometry, cube.matrix);
+    // cube4.merge(cube2.geometry, cube2.matrix);
+    // cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material);
+    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
-    scene.add(currentPiece);
     currentPiece.position.set(-2, 20, 1);
+    scene.add(currentPiece);
   }
 
   function spawnOPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xffe100});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(-4, 0, -4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(-4, 0, 0);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
     // For making cube...unsure about keeping
-    const cube4 = new THREE.Mesh(geometry, material);
+    const cube4 = new Physijs.BoxMesh(geometry, material);
     cube4.position.set(0, 4, -4);
     cube4.castShadow = true;
     cube4.receiveShadow = true;
     cube4.updateMatrix();
 
-    const cube5 = new THREE.Mesh(geometry, material);
+    const cube5 = new Physijs.BoxMesh(geometry, material);
     cube5.position.set(-4, 4, 0);
     cube5.updateMatrix();
 
-    const cube6 = new THREE.Mesh(geometry, material);
+    const cube6 = new Physijs.BoxMesh(geometry, material);
     cube6.position.set(-4, 4, -4);
     cube6.castShadow = true;
     cube6.receiveShadow = true;
     cube6.updateMatrix();
 
-    const cube7 = new THREE.Mesh(geometry, material);
+    const cube7 = new Physijs.BoxMesh(geometry, material);
     cube7.position.set(0, 4, 0);
     cube7.castShadow = true;
     cube7.receiveShadow = true;
     cube7.updateMatrix();
 
-    const cube8 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube8.merge(cube.geometry, cube.matrix);
-    cube8.merge(cube2.geometry, cube2.matrix);
-    cube8.merge(cube3.geometry, cube3.matrix);
-    cube8.merge(cube.geometry, cube4.matrix);
-    cube8.merge(cube2.geometry, cube5.matrix);
-    cube8.merge(cube3.geometry, cube6.matrix);
-    cube8.merge(cube.geometry, cube7.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece.add(cube, cube2, cube3, cube4, cube5, cube6, cube7);
+    // cube8.merge(cube.geometry, cube.matrix);
+    // cube8.merge(cube2.geometry, cube2.matrix);
+    // cube8.merge(cube3.geometry, cube3.matrix);
+    // cube8.merge(cube.geometry, cube4.matrix);
+    // cube8.merge(cube2.geometry, cube5.matrix);
+    // cube8.merge(cube3.geometry, cube6.matrix);
+    // cube8.merge(cube.geometry, cube7.matrix);
 
-    currentPiece = new THREE.Mesh(cube8, material);
+    //currentPiece = new Physijs.BoxMesh(cube8, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
-    scene.add(currentPiece);
     currentPiece.position.set(-2, 20, 1);
+    scene.add(currentPiece);
   }
 
   function spawnTPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x6d2e8c});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix);
-    cube4.merge(cube2.geometry, cube2.matrix);
-    cube4.merge(cube3.geometry, cube3.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece.add(cube, cube2, cube3);
+    // cube4.merge(cube.geometry, cube.matrix);
+    // cube4.merge(cube2.geometry, cube2.matrix);
+    // cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material);
+    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
-    scene.add(currentPiece);
     currentPiece.position.set(-2, 20, 1);
+    scene.add(currentPiece);
   }
 
   function spawnSPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x37b027});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(-4, 0, 0);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(0, 0, 4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(-4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix);
-    cube4.merge(cube2.geometry, cube2.matrix);
-    cube4.merge(cube3.geometry, cube3.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece.add(cube, cube2, cube3);
+    // cube4.merge(cube.geometry, cube.matrix);
+    // cube4.merge(cube2.geometry, cube2.matrix);
+    // cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material);
+    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
-    scene.add(currentPiece);
     currentPiece.position.set(-2, 20, 1);
+    scene.add(currentPiece);
   }
 
   function spawnZPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xc71414});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(4, 0, 0);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(0, 0, 4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix);
-    cube4.merge(cube2.geometry, cube2.matrix);
-    cube4.merge(cube3.geometry, cube3.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece.add(cube, cube2, cube3);
+    // cube4.merge(cube.geometry, cube.matrix);
+    // cube4.merge(cube2.geometry, cube2.matrix);
+    // cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material);
+    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -234,67 +232,70 @@ function spawnPiece() {
   function spawnJPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x19308c});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(4, 0, -8);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix);
-    cube4.merge(cube2.geometry, cube2.matrix);
-    cube4.merge(cube3.geometry, cube3.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    // cube4.merge(cube.geometry, cube.matrix);
+    // cube4.merge(cube2.geometry, cube2.matrix);
+    // cube4.merge(cube3.geometry, cube3.matrix);
+    currentPiece.add(cube, cube2, cube3);
 
-    currentPiece = new THREE.Mesh(cube4, material);
+    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
-    scene.add(currentPiece);
+    currentPiece.collisions = 0;
     currentPiece.position.set(-2, 20, 1);
+    scene.add(currentPiece);
   }
 
   function spawnLPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xde7a10});
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Physijs.BoxMesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new THREE.Mesh(geometry, material);
+    const cube2 = new Physijs.BoxMesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new THREE.Mesh(geometry, material);
+    const cube3 = new Physijs.BoxMesh(geometry, material);
     cube3.position.set(4, 0, 0);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const cube4 = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
-    cube4.merge(cube.geometry, cube.matrix);
-    cube4.merge(cube2.geometry, cube2.matrix);
-    cube4.merge(cube3.geometry, cube3.matrix);
+    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece.add(cube, cube2, cube3);
+    // cube4.merge(cube.geometry, cube.matrix);
+    // cube4.merge(cube2.geometry, cube2.matrix);
+    // cube4.merge(cube3.geometry, cube3.matrix);
 
-    currentPiece = new THREE.Mesh(cube4, material);
+    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
-    scene.add(currentPiece);
     currentPiece.position.set(-2, 20, 1);
+    scene.add(currentPiece);
   }
 
   // Spawn pieces randomly
@@ -313,7 +314,7 @@ function spawnPiece() {
 // Singular function to initialize scene + rendering
 function init() {
   // Initialize scene
-  scene = new THREE.Scene();
+  scene = new Physijs.Scene();
   scene.background = new THREE.Color( 0xcce0ff );
 
   // Add Fog
@@ -363,7 +364,7 @@ function init() {
   // Setup placeholder floor
   const floorGeometry = new THREE.BoxGeometry(100, 0.1, 100);
   const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
-  floorCube = new THREE.Mesh(floorGeometry, floorMaterial);
+  floorCube = new Physijs.BoxMesh(floorGeometry, floorMaterial, 0);
   floorCube.receiveShadow = true;
   floorCube.position.y = -1;
   scene.add(floorCube);
@@ -431,25 +432,25 @@ function init() {
     transparent: true,
   });
   // Left
-  leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial);
+  leftWallCube = new Physijs.BoxMesh(sideWallGeometry, wallMaterial, 0);
   leftWallCube.position.x = -20;
   leftWallCube.position.y = 23;
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
   // Right
-  rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial);
+  rightWallCube = new Physijs.BoxMesh(sideWallGeometry, wallMaterial, 0);
   rightWallCube.position.x = 20;
   rightWallCube.position.y = 23;
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
   // south
-  northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial);
+  northWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
   northWallCube.position.y = 23;
   northWallCube.position.z = 19;
   scene.add(northWallCube);
   // north
-  southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial);
+  southWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
   southWallCube.position.y = 23;
   southWallCube.position.z = -21;
@@ -461,22 +462,23 @@ function animate() {
   requestAnimationFrame(animate);
 
   // Move cube
-  currentPiece.position.x += dxPerFrameX;
-  currentPiece.position.y += dxPerFrameY;
-  currentPiece.position.z += dxPerFrameZ;
+  // currentPiece.position.x += dxPerFrameX;
+  // currentPiece.position.y += dxPerFrameY;
+  // currentPiece.position.z += dxPerFrameZ;
 
   // If cube hits ground, stop
-  if (currentPiece.position.y > 20) {
-    dxPerFrameY = -0.05;
-  }
-  if (currentPiece.position.y <= 0) {
-    dxPerFrameY = 0;
-    spawnPiece();
-    dxPerFrameY = -0.05;
-  }
+  // if (currentPiece.position.y > 20) {
+  //   dxPerFrameY = -0.05;
+  // }
+  // if (currentPiece.position.y <= 0) {
+  //   dxPerFrameY = 0;
+  //   spawnPiece();
+  //   dxPerFrameY = -0.05;
+  // }
 
   // Render
   renderer.render(scene, camera);
+  scene.simulate();
 }
 
 // Ensure scene view resizes with window
@@ -503,44 +505,25 @@ function onDocumentKeyDown(event) {
     }
     console.log('space down');
   } else if (keyCode == 68) {
-    const pieceVector = new THREE.Vector3();
-    pieceVector.setFromMatrixPosition( currentPiece.matrixWorld ).max;
-    const rightWallVector = new THREE.Vector3();
-    rightWallVector.setFromMatrixPosition( rightWallCube.matrixWorld );
-
-    if (pieceVector.x < rightWallVector.x && dxPerFrameY < 0) {
-      const close = rightWallVector.x - pieceVector.x;
-      if (gridSize < close) {
-        currentPiece.position.x += gridSize;
-      }
-    }
-    else {
-      dxPerFrameX = 0;
-    }
-    console.log('d down');
-  }
-  else if (keyCode == 65) {
-    if (currentPiece.position.x >= -16 && dxPerFrameY < 0) {
-      currentPiece.position.x -= gridSize;
-    } else {
-      dxPerFrameX = 0;
-    }
-    console.log('a down');
-  }
-  else if (keyCode == 87) {
-    if (currentPiece.position.z >= -16 && dxPerFrameY < 0) {
-      currentPiece.position.z -= gridSize;
-    } else {
-      dxPerFrameZ = 0;
-    }
+      let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+      let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
+      currentPiece.setLinearVelocity(playerVec3)
+      console.log('d down');
+  } else if (keyCode == 65) {
+      let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+      let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
+      currentPiece.setLinearVelocity(playerVec3)
+      console.log('a down');
+  } else if (keyCode == 87) {
+    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
+    currentPiece.setLinearVelocity(playerVec3)
     console.log('w down');
   }
   else if (keyCode == 83) {
-    if (currentPiece.position.z <= 16 && dxPerFrameY < 0) {
-      currentPiece.position.z += gridSize;
-    } else {
-      dxPerFrameZ = 0;
-    }
+    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
+    currentPiece.setLinearVelocity(playerVec3)
     console.log('s down');
   }
   else if (keyCode == 82) {
@@ -560,6 +543,8 @@ function onDocumentKeyDown(event) {
       currentPiece.rotation.y += Math.PI / -2;
     }
     console.log('e down');
+  } else if (keyCode == 84) {
+    spawnPiece();
   };
 };
 
