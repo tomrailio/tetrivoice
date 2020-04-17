@@ -12,6 +12,7 @@ let camera;
 let renderer;
 let floorCube;
 let currentPiece;
+let startPosition = new THREE.Vector3(-2, 20, 1);
 // Cube animation vars
 let dxPerFrameX = 0;
 let dxPerFrameY = 1;
@@ -19,8 +20,8 @@ let dxPerFrameZ = 0;
 // voice Recognition
 const voiceCommands = [
   'rotate',
-  'rotate right',
-  'rotate left',
+  'rotate right', // unused
+  'rotate left', // unused
   'left',
   'right',
   'up',
@@ -53,13 +54,9 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3)
-    // cube4.merge(cube.geometry, cube.matrix);
-    // cube4.merge(cube2.geometry, cube2.matrix);
-    // cube4.merge(cube3.geometry, cube3.matrix);
-
-    //currentPiece = new Physijs.BoxMesh(cube4, material);
+    currentPiece.updateMatrix();
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.position.set(-2, 20, 1);
@@ -110,17 +107,8 @@ function spawnPiece() {
     cube7.receiveShadow = true;
     cube7.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3, cube4, cube5, cube6, cube7);
-    // cube8.merge(cube.geometry, cube.matrix);
-    // cube8.merge(cube2.geometry, cube2.matrix);
-    // cube8.merge(cube3.geometry, cube3.matrix);
-    // cube8.merge(cube.geometry, cube4.matrix);
-    // cube8.merge(cube2.geometry, cube5.matrix);
-    // cube8.merge(cube3.geometry, cube6.matrix);
-    // cube8.merge(cube.geometry, cube7.matrix);
-
-    //currentPiece = new Physijs.BoxMesh(cube8, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.position.set(-2, 20, 1);
@@ -148,13 +136,8 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
-    // cube4.merge(cube.geometry, cube.matrix);
-    // cube4.merge(cube2.geometry, cube2.matrix);
-    // cube4.merge(cube3.geometry, cube3.matrix);
-
-    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.position.set(-2, 20, 1);
@@ -182,13 +165,8 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
-    // cube4.merge(cube.geometry, cube.matrix);
-    // cube4.merge(cube2.geometry, cube2.matrix);
-    // cube4.merge(cube3.geometry, cube3.matrix);
-
-    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.position.set(-2, 20, 1);
@@ -216,13 +194,8 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
-    // cube4.merge(cube.geometry, cube.matrix);
-    // cube4.merge(cube2.geometry, cube2.matrix);
-    // cube4.merge(cube3.geometry, cube3.matrix);
-
-    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     scene.add(currentPiece);
@@ -250,13 +223,8 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
-    // cube4.merge(cube.geometry, cube.matrix);
-    // cube4.merge(cube2.geometry, cube2.matrix);
-    // cube4.merge(cube3.geometry, cube3.matrix);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
-
-    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.collisions = 0;
@@ -285,13 +253,8 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    const currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new Physijs.BoxMesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
-    // cube4.merge(cube.geometry, cube.matrix);
-    // cube4.merge(cube2.geometry, cube2.matrix);
-    // cube4.merge(cube3.geometry, cube3.matrix);
-
-    //currentPiece = new Physijs.BoxMesh(cube4, material);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.position.set(-2, 20, 1);
@@ -357,8 +320,7 @@ function init() {
   // Add controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  // Spawn initial cube
-  // spawnCube();
+  // Spawn initial piece
   spawnPiece();
 
   // Setup placeholder floor
@@ -461,21 +423,6 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
-  // Move cube
-  // currentPiece.position.x += dxPerFrameX;
-  // currentPiece.position.y += dxPerFrameY;
-  // currentPiece.position.z += dxPerFrameZ;
-
-  // If cube hits ground, stop
-  // if (currentPiece.position.y > 20) {
-  //   dxPerFrameY = -0.05;
-  // }
-  // if (currentPiece.position.y <= 0) {
-  //   dxPerFrameY = 0;
-  //   spawnPiece();
-  //   dxPerFrameY = -0.05;
-  // }
-
   // Render
   renderer.render(scene, camera);
   scene.simulate();
@@ -519,15 +466,13 @@ function onDocumentKeyDown(event) {
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
     currentPiece.setLinearVelocity(playerVec3)
     console.log('w down');
-  }
-  else if (keyCode == 83) {
+  } else if (keyCode == 83) {
     let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
     currentPiece.setLinearVelocity(playerVec3)
     console.log('s down');
-  }
-  else if (keyCode == 82) {
-    currentPiece.position.y = 20;
+  } else if (keyCode == 82) {
+    currentPiece.position(startPosition);
     dxPerFrameY = -0.05;
     console.log('r down');
   }
@@ -604,17 +549,6 @@ window.addEventListener('DOMContentLoaded', () => {
     const onResult = (event) => {
       for (const res of event.results) {
         console.log(res[0].transcript);
-        // let i;
-        // let newconf;
-        // let oldconf = 0;
-        // let output;
-        // for (i=0; i< res.length; i++) {
-        //   newconf = res[i].confidence;
-        //   if (newconf > oldconf); {
-        //     oldconf = res[i].confidence;
-        //     output = res[i].transcript;
-        //   }
-        // }
         console.log(event.results);
         if (res[0].transcript == voiceCommands[0]) {
           console.log("matched " + voiceCommands[1]);
