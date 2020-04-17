@@ -13,14 +13,25 @@ let dxPerFrameX = 0;
 let dxPerFrameY = 1;
 let dxPerFrameZ = 0;
 // voice Recognition
+// const voiceCommands = [
+//   'rotate',
+//   'rotate right',
+//   'rotate left',
+//   'move left',
+//   'move right',
+//   'move up',
+//   'move down',
+//   'drop',
+// ];
+
 const voiceCommands = [
   'rotate',
   'rotate right',
   'rotate left',
-  'move left',
-  'move right',
-  'move up',
-  'move down',
+  'left',
+  'right',
+  'up',
+  'down',
   'drop',
 ];
 
@@ -581,6 +592,7 @@ function onDocumentKeyUp(event) {
   }
 };
 
+// Handle microphone input
 window.addEventListener('DOMContentLoaded', () => {
   const button = document.getElementById("button");
   const main = document.getElementsByTagName("main")[0];
@@ -606,13 +618,74 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const onResult = (event) => {
       for (const res of event.results) {
-        const text = document.createTextNode(res[0].transcript);
         console.log(res[0].transcript);
-        console.log(event.results)
+        // let i;
+        // let newconf;
+        // let oldconf = 0;
+        // let output;
+        // for (i=0; i< res.length; i++) {
+        //   newconf = res[i].confidence;
+        //   if (newconf > oldconf); {
+        //     oldconf = res[i].confidence;
+        //     output = res[i].transcript;
+        //   }
+        // }
+        console.log(event.results);
         if (res[0].transcript == voiceCommands[0]) {
+          console.log("matched " + voiceCommands[1]);
           if (dxPerFrameY < 0) {
             currentPiece.rotation.y += Math.PI / 2;
           }
+        // } else if (res[0].transcript == voiceCommands[1]) {
+        //   console.log("matched " + voiceCommands[1]);
+        //   if (dxPerFrameY < 0) {
+        //     currentPiece.rotation.y += Math.PI / 2;
+        //   }
+        // } else if (res[0].transcript == voiceCommands[2]) {
+        //   console.log("matched " + voiceCommands[2]);
+        //   if (dxPerFrameY < 0) {
+        //     currentPiece.rotation.y += Math.PI / -2;
+        //   }
+        } else if (res[0].transcript == voiceCommands[3]) {
+          console.log("matched " + voiceCommands[3]);
+          if (currentPiece.position.x >= -16 && dxPerFrameY < 0) {
+            currentPiece.position.x -= gridSize;
+          } else {
+            dxPerFrameX = 0;
+          }
+        } else if (res[0].transcript == voiceCommands[4]) {
+          console.log("matched " + voiceCommands[4]);
+          if (currentPiece.position.x <= 16 && dxPerFrameY < 0) {
+            currentPiece.position.x += gridSize;
+          } else {
+            dxPerFrameX = 0;
+          }
+          // if (pieceVector.x < rightWallVector.x && dxPerFrameY < 0) {
+          //   const close = rightWallVector.x - pieceVector.x;
+          //   if (gridSize < close) {
+          //     currentPiece.position.x += gridSize;
+          //   }
+          // }
+          // else {
+          //   dxPerFrameX = 0;
+          // }
+        } else if (res[0].transcript == voiceCommands[5]) {
+          console.log("matched " + voiceCommands[5]);
+          if (currentPiece.position.z >= -16 && dxPerFrameY < 0) {
+            currentPiece.position.z -= gridSize;
+          } else {
+            dxPerFrameZ = 0;
+          }
+        } else if (res[0].transcript == voiceCommands[6]) {
+          console.log("matched " + voiceCommands[6]);
+          if (currentPiece.position.z <= 16 && dxPerFrameY < 0) {
+            currentPiece.position.z += gridSize;
+          } else {
+            dxPerFrameZ = 0;
+          }
+        } else if (res[0].transcript == voiceCommands[7]) {
+          console.log("matched " + voiceCommands[7]);
+          dxPerFrameY = -0.5;
         } else {
           console.log('No voice commands recognized');
         };
