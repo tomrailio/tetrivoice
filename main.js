@@ -12,7 +12,10 @@ let camera;
 let renderer;
 let floorCube;
 let currentPiece;
-let startPosition = new THREE.Vector3(-2, 20, 1);
+const defauCont = new THREE.Vector3(0,0,0);
+let contact_normal = new THREE.Vector3(0, 0, 0);
+let collidableMeshList = [];
+let pieceCollision;
 // Cube animation vars
 let dxPerFrameX = 0;
 let dxPerFrameY = 1;
@@ -272,6 +275,14 @@ function spawnPiece() {
     spawnLPiece,
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
+
+  currentPiece.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+    // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
+    console.log(other_object);
+    console.log(relative_rotation);
+    console.log(relative_velocity);
+    console.log(contact_normal);
+  });
 }
 
 // Singular function to initialize scene + rendering
@@ -331,6 +342,8 @@ function init() {
   floorCube.receiveShadow = true;
   floorCube.position.y = -1;
   scene.add(floorCube);
+  floorCube.name = "ground"
+  collidableMeshList.push(floorCube);
 
   // Draw floor grid
   const lineMaterial = new THREE.MeshPhongMaterial({
@@ -400,33 +413,62 @@ function init() {
   leftWallCube.position.y = 23;
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
+  leftWallCube.name = "leftWall"
+  collidableMeshList.push(leftWallCube);
   // Right
   rightWallCube = new Physijs.BoxMesh(sideWallGeometry, wallMaterial, 0);
   rightWallCube.position.x = 20;
   rightWallCube.position.y = 23;
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
+  rightWallCube.name = "rightWall"
+  collidableMeshList.push(rightWallCube);
   // south
   northWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
   northWallCube.position.y = 23;
   northWallCube.position.z = 19;
   scene.add(northWallCube);
+  northWallCube.name = "northWall"
+  collidableMeshList.push(northWallCube);
   // north
   southWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
   southWallCube.position.y = 23;
   southWallCube.position.z = -21;
   scene.add(southWallCube);
+  southWallCube.name = "southWall"
+  collidableMeshList.push(southWallCube);
 }
 
 // Animate scene
 function animate() {
   requestAnimationFrame(animate);
 
+  currentPiece.__dirtyRotation = true;
+  currentPiece.__dirtyPosition = true;
+
+  var originPoint = currentPiece.position.clone();
+  for (var vertexIndex = 0; vertexIndex < currentPiece.geometry.vertices.length; vertexIndex++) {		
+		var localVertex = currentPiece.geometry.vertices[vertexIndex].clone();
+		var globalVertex = localVertex.applyMatrix4( currentPiece.matrix );
+		var directionVector = globalVertex.sub( currentPiece.position );
+		
+		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+		var collisionResults = ray.intersectObjects( collidableMeshList );
+		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+      console.log(" Hit ");
+      pieceCollision = true;
+    } else
+      pieceCollision = false;
+    {
+
+    }
+	}
+
   // Render
-  renderer.render(scene, camera);
   scene.simulate();
+  renderer.render(scene, camera);
 }
 
 // Ensure scene view resizes with window
@@ -447,44 +489,53 @@ function onDocumentKeyDown(event) {
   if (keyCode == 32) {
     let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3);
+    // currentPiece.setLinearVelocity(playerVec3);
+    // console.log(floorCube._physijs.id)
+    // console.log(currentPiece._physijs.touches.indexOf(floorCube._physijs.id))
+    // if (currentPiece._physijs.touches.indexOf(floorCube._physijs.id) == 0) {
+    //   console.log("ground hit 5 yeah");
+    // }
     console.log('space down');
   } else if (keyCode == 68) {
-      let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-      let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
-      currentPiece.setLinearVelocity(playerVec3)
+      // let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+      // let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
+      // currentPiece.setLinearVelocity(playerVec3)
+      // console.log(leftWallCube._physijs.id)
+      // console.log(currentPiece._physijs.touches)
+      if (!pieceCollision) {
+        console.log("moving")
+        currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
+      };
       console.log('d down');
   } else if (keyCode == 65) {
-      let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-      let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
-      currentPiece.setLinearVelocity(playerVec3)
+      // let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+      // let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
+      // currentPiece.setLinearVelocity(playerVec3)
+      currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
       console.log('a down');
   } else if (keyCode == 87) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
-    currentPiece.setLinearVelocity(playerVec3)
+    // let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    // let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
+    // currentPiece.setLinearVelocity(playerVec3)
+    currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z - 4);
     console.log('w down');
   } else if (keyCode == 83) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
-    currentPiece.setLinearVelocity(playerVec3)
+    // let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    // let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
+    // currentPiece.setLinearVelocity(playerVec3)
+    currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + 4);
     console.log('s down');
   } else if (keyCode == 82) {
-    currentPiece.position(startPosition);
-    dxPerFrameY = -0.05;
+    currentPiece.position.set(-2, 20, 1);
     console.log('r down');
   }
   // Rotation
   else if (keyCode == 81) {
-    // if (dxPerFrameY < 0) {
-    //   currentPiece.rotation.y += Math.PI / 2;
-    // }
+    currentPiece.rotation.y += Math.PI / 2;
     console.log('q down');
   }
   else if (keyCode == 69) {
-    // if (dxPerFrameY < 0) {
-    //   currentPiece.rotation.y += Math.PI / -2;
-    // }
+    currentPiece.rotation.y += Math.PI / -2;
     console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
@@ -501,19 +552,18 @@ function onDocumentKeyUp(event) {
     console.log('space up');
   }
   else if (keyCode == 68) {
-    dxPerFrameX = 0;
+    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let playerVec3 = new THREE.Vector3(oldVector.x + -oldVector.x, oldVector.y, oldVector.z);
+    currentPiece.setLinearVelocity(playerVec3)
     console.log('d up');
   }
   else if (keyCode == 65) {
-    dxPerFrameX = 0;
     console.log('a up');
   }
   else if (keyCode == 87) {
-    dxPerFrameZ = 0;
     console.log('w up');
   }
   else if (keyCode == 83) {
-    dxPerFrameZ = 0;
     console.log('s up');
   }
 };
