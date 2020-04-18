@@ -24,6 +24,7 @@ const voiceCommands = [
   'move',
   'drop',
   'swap',
+  'spawn'
 ];
 
 // Spawn tetrominoes
@@ -622,9 +623,9 @@ window.addEventListener('DOMContentLoaded', () => {
       for (const res of event.results) {
         // Try to filter rapid voice results
         if (res.isFinal) {
+          speechSynthesis.pause();
           console.log(res);
           let matchedWord = res[0].transcript.trim().split(' ');
-          //console.log(matchedWord.length)
           if (matchedWord.length != 0) {
             matchedWord = matchedWord.sort();
             // Find most used word
@@ -645,17 +646,17 @@ window.addEventListener('DOMContentLoaded', () => {
               if (countsArr[arr][1] > newBig) {
                 newBig = arr;
               }
-              //console.log(countsArr[arr][1])
             }
             console.log('the final word is ' + countsArr[newBig][0])
+            // Set most used word to matchedWord
             matchedWord = countsArr[newBig][0];
           }
 
           console.log(matchedWord);
-          // Calculate closest command. Take [rotate rotate move rotate] and do rotate.
           if (matchedWord == voiceCommands[0]) {
             console.log("matched " + voiceCommands[0]);
             currentPiece.rotation.y += Math.PI / 2;
+            console.log('rotated piece')
           } else if (matchedWord == voiceCommands[1]) {
             console.log("matched " + voiceCommands[1])
             let oldVector = currentPiece.getLinearVelocity();
@@ -668,9 +669,14 @@ window.addEventListener('DOMContentLoaded', () => {
             currentPiece.setLinearVelocity(playerVec3);
           } else if (matchedWord == voiceCommands[3]) {
             console.log("matched " + voiceCommands[3]);
+          } else if (matchedWord == voiceCommands[4]) {
+            spawnPiece();
+            console.log("matched " + voiceCommands[4]);
           } else {
             console.log('No voice commands recognized');
           };
+          speechSynthesis.cancel();
+          speechSynthesis.resume();
         }
       }
     };
