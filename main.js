@@ -9,13 +9,15 @@ Physijs.scripts.ammo = './ammo.js';
 let scene;
 let camera;
 let renderer;
+
+const spawnCord = new THREE.Vector3(-2, 40, 1);
+const gridSize = 4;
 let floorCube;
 let currentPiece;
 let pieceCollision;
 let collidableMeshList = [];
 let hitCounter = 0;
-const spawnCord = new THREE.Vector3(-2, 40, 1);
-const gridSize = 4;
+
 // voice Recognition
 const voiceCommands = [
   'rotate',
@@ -361,7 +363,7 @@ function setupWalls() {
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
   leftWallCube.name = "leftWall"
-  collidableMeshList.push(leftWallCube);
+  //collidableMeshList.push(leftWallCube);
   // Right
   rightWallCube = new Physijs.BoxMesh(sideWallGeometry, wallMaterial, 0);
   rightWallCube.position.x = 20;
@@ -369,7 +371,7 @@ function setupWalls() {
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
   rightWallCube.name = "rightWall"
-  collidableMeshList.push(rightWallCube);
+  //collidableMeshList.push(rightWallCube);
   // south
   northWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
@@ -377,7 +379,7 @@ function setupWalls() {
   northWallCube.position.z = 19;
   scene.add(northWallCube);
   northWallCube.name = "northWall"
-  collidableMeshList.push(northWallCube);
+  //collidableMeshList.push(northWallCube);
   // north
   southWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
@@ -385,7 +387,7 @@ function setupWalls() {
   southWallCube.position.z = -21;
   scene.add(southWallCube);
   southWallCube.name = "southWall"
-  collidableMeshList.push(southWallCube);
+  //collidableMeshList.push(southWallCube);
 }
 
 // Singular function to initialize scene + rendering
@@ -489,7 +491,7 @@ function onDocumentKeyDown(event) {
   const keyCode = event.which;
   // Movement
   if (keyCode == 32) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let oldVector = currentPiece.getLinearVelocity();
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
     currentPiece.setLinearVelocity(playerVec3);
     // console.log(floorCube._physijs.id)
@@ -499,34 +501,44 @@ function onDocumentKeyDown(event) {
     // }
     console.log('space down');
   } else if (keyCode == 68) {
-      let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-      let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
-      currentPiece.setLinearVelocity(playerVec3)
+      if (currentPiece.position.x < 12) {
+        currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
+      } else {
+        let oldVector = currentPiece.getLinearVelocity();
+        let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
+        currentPiece.setLinearVelocity(playerVec3)
+      }
       // console.log(leftWallCube._physijs.id)
       // console.log(currentPiece._physijs.touches)
-      // if (!pieceCollision) {
-      //   console.log("moving")
-      //   currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
-      // };
       console.log('d down');
   } else if (keyCode == 65) {
-      let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-      let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
-      currentPiece.setLinearVelocity(playerVec3)
-      // currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
+      if (currentPiece.position.x > -12) {
+        currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
+      } else {
+        let oldVector = currentPiece.getLinearVelocity();
+        let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
+        currentPiece.setLinearVelocity(playerVec3)
+      }
       console.log('a down');
   } else if (keyCode == 87) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
-    currentPiece.setLinearVelocity(playerVec3)
-    // currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z - 4);
+    if (currentPiece.position.z > -4) {
+      currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z - 4);
+    } else {
+      let oldVector = currentPiece.getLinearVelocity();
+      let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
+      currentPiece.setLinearVelocity(playerVec3)
+    }
     console.log('w down');
   } else if (keyCode == 83) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
-    currentPiece.setLinearVelocity(playerVec3)
-    // currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + 4);
+    if (currentPiece.position.z < 12) {
+      currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + 4);
+    } else {
+      let oldVector = currentPiece.getLinearVelocity();
+      let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
+      currentPiece.setLinearVelocity(playerVec3)
+    }
     console.log('s down');
+    console.log(currentPiece.position)
   } else if (keyCode == 82) {
     currentPiece.position.set(-2, 20, 1);
     console.log('r down');
@@ -548,31 +560,31 @@ document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
   const keyCode = event.which;
   if (keyCode == 32) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let oldVector = currentPiece.getLinearVelocity();
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + -oldVector.y, oldVector.z);
     currentPiece.setLinearVelocity(playerVec3);
     console.log('space up');
   }
   else if (keyCode == 68) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let oldVector = currentPiece.getLinearVelocity();
     let playerVec3 = new THREE.Vector3(oldVector.x + -oldVector.x, oldVector.y, oldVector.z);
     currentPiece.setLinearVelocity(playerVec3)
     console.log('d up');
   }
   else if (keyCode == 65) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let oldVector = currentPiece.getLinearVelocity();
     let playerVec3 = new THREE.Vector3(oldVector.x + -oldVector.x, oldVector.y, oldVector.z);
     currentPiece.setLinearVelocity(playerVec3)
     console.log('a up');
   }
   else if (keyCode == 87) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let oldVector = currentPiece.getLinearVelocity();
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + -oldVector.z);
     currentPiece.setLinearVelocity(playerVec3)
     console.log('w up');
   }
   else if (keyCode == 83) {
-    let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+    let oldVector = currentPiece.getLinearVelocity();
     let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + -oldVector.z);
     currentPiece.setLinearVelocity(playerVec3)
     console.log('s up');
@@ -606,24 +618,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const onResult = (event) => {
       for (const res of event.results) {
-        console.log(res[0].transcript);
+        console.log(res[0].transcript.trim());
         console.log(event.results);
-        if (res[0].transcript == voiceCommands[0]) {
+        if (res[0].transcript.trim() == voiceCommands[0]) {
           console.log("matched " + voiceCommands[0]);
-          let oldVector = currentPiece.getLinearVelocity();
-          let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
-          currentPiece.setLinearVelocity(playerVec3)
-        } else if (res[0].transcript == voiceCommands[1]) {
+          currentPiece.rotation.y += Math.PI / 2;
+        } else if (res[0].transcript.trim() == voiceCommands[1]) {
           console.log("matched " + voiceCommands[1])
-          let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+          let oldVector = currentPiece.getLinearVelocity();
           let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
           currentPiece.setLinearVelocity(playerVec3)
-        } else if (res[0].transcript == voiceCommands[2]) {
+        } else if (res[0].transcript.trim() == voiceCommands[2]) {
           console.log("matched " + voiceCommands[2])
-          let oldVector = currentPiece.getLinearVelocity(); // Vector of velocity the player already has
+          let oldVector = currentPiece.getLinearVelocity();
           let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
           currentPiece.setLinearVelocity(playerVec3);
-        } else if (res[0].transcript == voiceCommands[3]) {
+        } else if (res[0].transcript.trim() == voiceCommands[3]) {
           console.log("matched " + voiceCommands[3]);
         } else {
           console.log('No voice commands recognized');
