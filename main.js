@@ -277,6 +277,8 @@ function spawnPiece() {
     // console.log(relative_velocity);
     // console.log(contact_normal);
   });
+
+  currentPiece.updateMatrix();
 }
 
 // Spawn arena floor
@@ -468,7 +470,7 @@ function animate() {
     } else {
       pieceCollision = false;
     };
-	};
+  };
 
   // Render
   scene.simulate();
@@ -618,30 +620,62 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const onResult = (event) => {
       for (const res of event.results) {
-        console.log(res[0].transcript.trim());
-        console.log(event.results);
-        if (res[0].transcript.trim() == voiceCommands[0]) {
-          console.log("matched " + voiceCommands[0]);
-          currentPiece.rotation.y += Math.PI / 2;
-        } else if (res[0].transcript.trim() == voiceCommands[1]) {
-          console.log("matched " + voiceCommands[1])
-          let oldVector = currentPiece.getLinearVelocity();
-          let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
-          currentPiece.setLinearVelocity(playerVec3)
-        } else if (res[0].transcript.trim() == voiceCommands[2]) {
-          console.log("matched " + voiceCommands[2])
-          let oldVector = currentPiece.getLinearVelocity();
-          let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
-          currentPiece.setLinearVelocity(playerVec3);
-        } else if (res[0].transcript.trim() == voiceCommands[3]) {
-          console.log("matched " + voiceCommands[3]);
-        } else {
-          console.log('No voice commands recognized');
-        };
+        // Try to filter rapid voice results
+        if (res.isFinal) {
+          console.log(res);
+          let matchedWord = res[0].transcript.trim().split(' ');
+          //console.log(matchedWord.length)
+          if (matchedWord.length != 0) {
+            matchedWord = matchedWord.sort();
+            // Find most used word
+            let counts = {};
+            let countsArr = [];
+            for (let i = 0; i < matchedWord.length; i++) {
+              counts[matchedWord[i]] = 1 + (counts[matchedWord[i]] || 0);
+            }
+            for (let command in counts) {
+              countsArr.push([command, counts[command]]);
+          }
+          let newBig = 0;
+          countsArr.sort(function(a, b) {
+              return a[1] - b[1];
+          });          
+            console.log(countsArr);
+            for (let arr in countsArr) {
+              if (countsArr[arr][1] > newBig) {
+                newBig = arr;
+              }
+              //console.log(countsArr[arr][1])
+            }
+            console.log('the final word is ' + countsArr[newBig][0])
+            matchedWord = countsArr[newBig][0];
+          }
+
+          console.log(matchedWord);
+          // Calculate closest command. Take [rotate rotate move rotate] and do rotate.
+          if (matchedWord == voiceCommands[0]) {
+            console.log("matched " + voiceCommands[0]);
+            currentPiece.rotation.y += Math.PI / 2;
+          } else if (matchedWord == voiceCommands[1]) {
+            console.log("matched " + voiceCommands[1])
+            let oldVector = currentPiece.getLinearVelocity();
+            let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
+            currentPiece.setLinearVelocity(playerVec3)
+          } else if (matchedWord == voiceCommands[2]) {
+            console.log("matched " + voiceCommands[2])
+            let oldVector = currentPiece.getLinearVelocity();
+            let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
+            currentPiece.setLinearVelocity(playerVec3);
+          } else if (matchedWord == voiceCommands[3]) {
+            console.log("matched " + voiceCommands[3]);
+          } else {
+            console.log('No voice commands recognized');
+          };
+        }
       }
     };
     recognition.continuous = true;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.addEventListener("result", onResult);
     button.addEventListener("click", event => {
       listening ? stop() : start();
