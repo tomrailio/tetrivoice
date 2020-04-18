@@ -426,6 +426,8 @@ function init() {
   camera.position.y = 100;
   camera.position.x = 0;
 
+  camera.translateY(10);
+
   // Setup renderer
   renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
   renderer.shadowMap.enabled = true; // Enable shadows
@@ -656,7 +658,6 @@ window.addEventListener('DOMContentLoaded', () => {
           if (matchedWord == voiceCommands[0]) {
             console.log("matched " + voiceCommands[0]);
             currentPiece.rotation.y += Math.PI / 2;
-            console.log('rotated piece')
           } else if (matchedWord == voiceCommands[1]) {
             console.log("matched " + voiceCommands[1])
             let oldVector = currentPiece.getLinearVelocity();

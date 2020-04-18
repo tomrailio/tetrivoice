@@ -15,6 +15,43 @@ canvas {
   z-index: 100;
   display: block;
 }
+#title {
+  position: absolute;
+  top: 10px;
+  width: 100%;
+  text-align: center;
+  z-index: 100;
+  display: block;
+  font-family: tetrominoes;
+  font-size: 50px;
+}
+.anchor{
+  display: block;
+  height: 115px; /*same height as header*/
+  margin-top: -115px; /*same height as header*/
+  visibility: hidden;
+}
+@font-face {
+  font-family: tetrominoes;
+  src: url(./fonts/tetrominoes.ttf);
+}
+#voiceComs {
+  position: absolute;
+  top: 250px;
+  width: 100%;
+  text-align: right;
+  z-index: 100;
+  display: block;
+}
+#keyBinds {
+  position: absolute;
+  top: 250px;
+  width: 100%;
+  text-align: left;
+  z-index: 100;
+  display: block;
+  margin-left: 20px;
+}
 #text {
   position: absolute;
   top: 100px;

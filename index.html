@@ -9,16 +9,35 @@
   <link rel=stylesheet href="./style.css">
   <body>
     <script src="js/three.min.js"></script>
-    <script type="text/javascript" src="js/physi.js"></script>
+    <script src="js/physi.js"></script>
     <script src="js/OrbitControls.js"></script>
     <script src="main.js"></script>
-    <div id="info">Say "ROTATE" (KB: press Q or E) to rotate blocks. WASD to move blocks. Space to speed drop. R to reset. T to spawn blocks.</div>
+    <div id="title">Tetrovoix</div>
     <main>
       <div id="text">
         <button id="button">Start playing</button>
         <p id="message" hidden aria-hidden="true">
           Your browser doesn't support Speech Recognition. Sorry.
         </p>
+      </div>
+      <span class="anchor" id="section1"></span>
+      <div id="voiceComs" class="section">
+        Voice Commands:
+        <ul dir='rtl'>
+          <li>ROTATE</li>
+          <li>MOVE</li>
+          <li>DROP</li>
+          <li>SPAWN</li>
+        </ul>
+      </div>
+      <div id="keyBinds" class="section">
+        Keybinds:
+        <br></br>
+        <li>Q or E to rotate blocks</li>
+        <li>WASD to move blocks</li>
+        <li>Space to speed drop</li>
+        <li>T to spawn blocks</li>
+        <li>R to reset block</li>
       </div>
     </main>
   </body>
