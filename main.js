@@ -3,9 +3,6 @@
 /* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
 
-//Physijs.scripts.worker = './js/physijs_worker.js';
-//Physijs.scripts.ammo = './ammo.js';
-
 let scene;
 let camera;
 let renderer;
@@ -20,7 +17,7 @@ let blockerMeshList = [];
 let hitCounter = 0;
 let hittingWall = false;
 let wallsHitting = [];
-let wallCollisionResults = [{object: { name: 'no'}}];
+let wallCollisionResults = [{object: { name: ''}}];
 const defaultCubeSpeed = -0.05
 let cubeSpeed = defaultCubeSpeed;
 
@@ -474,13 +471,9 @@ function animate() {
     wallCollisionResults = ray.intersectObjects(blockerMeshList);
 
     if ( wallCollisionResults.length > 0 && wallCollisionResults[0].distance < directionVector.length() ) {
-      console.log('hit wall')
       hittingWall = true;
-      console.log(wallCollisionResults)
 		} else if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
       hitCounter += 1
-      console.log(" Hit ");
-      console.log(collisionResults)
       if (hitCounter > 6) {
         hitCounter = 0;
         spawnPiece();
@@ -492,7 +485,6 @@ function animate() {
   };
 
   // Render
-  //scene.simulate();
   renderer.render(scene, camera);
   if (currentPiece) {
     currentPiece.position.y += cubeSpeed;
@@ -509,6 +501,19 @@ function onWindowResize() {
 // Listen for window resize event
 window.addEventListener('resize', onWindowResize, false);
 
+// Check if currentPiece is hitting any walls
+function checkHit(piece) {
+  let hit = false;
+
+  wallCollisionResults.forEach(function(e) {
+    if (e.object.name == piece) {
+      hit = true;
+    }
+  });
+
+  return hit;
+};
+
 // Listen for keyboard input
 document.addEventListener('keydown', onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
@@ -518,22 +523,30 @@ function onDocumentKeyDown(event) {
     cubeSpeed = -0.3
     console.log('space down');
   } else if (keyCode == 68) {
-    if (wallCollisionResults[0].object.name != 'rightWall') {
+    if (checkHit('rightWall')) {
+      console.log('hitting right wall, not moving');
+    } else {
       currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
     };
     console.log('d down');
   } else if (keyCode == 65) {
-    if (wallCollisionResults[0].object.name != 'leftWall') {
+    if (checkHit('leftWall')) {
+      console.log('hitting left wall, not moving');
+    } else {
       currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
     };
     console.log('a down');
   } else if (keyCode == 87) {
-    if (wallCollisionResults[0].object.name != 'northWall') {
+    if (checkHit('northWall')) {
+      console.log('hitting north wall, not moving');
+    } else {
       currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z - 4);
     };
     console.log('w down');
   } else if (keyCode == 83) {
-    if (wallCollisionResults[0].object.name != 'southWall') {
+    if (checkHit('southWall')) {
+      console.log('hitting south wall, not moving');
+    } else {
       currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + 4);
     };
     console.log('s down');
@@ -640,17 +653,14 @@ window.addEventListener('DOMContentLoaded', () => {
           console.log(matchedWord);
           if (matchedWord == voiceCommands[0]) {
             console.log("matched " + voiceCommands[0]);
-            currentPiece.rotation.y += Math.PI / 2;
+            currentPiece.rotation.y += Math.PI / -2;
           } else if (matchedWord == voiceCommands[1]) {
             console.log("matched " + voiceCommands[1])
-            let oldVector = currentPiece.getLinearVelocity();
-            let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
-            currentPiece.setLinearVelocity(playerVec3)
+            currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
           } else if (matchedWord == voiceCommands[2]) {
             console.log("matched " + voiceCommands[2])
-            let oldVector = currentPiece.getLinearVelocity();
-            let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
-            currentPiece.setLinearVelocity(playerVec3);
+            // TODO: Ensure pieces drop at same place as they land 'naturally'
+            currentPiece.position.set(currentPiece.position.x, 0.6, currentPiece.position.z);
           } else if (matchedWord == voiceCommands[3]) {
             console.log("matched " + voiceCommands[3]);
           } else if (matchedWord == voiceCommands[4]) {
