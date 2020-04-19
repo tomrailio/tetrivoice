@@ -3,8 +3,8 @@
 /* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
 
-Physijs.scripts.worker = './js/physijs_worker.js';
-Physijs.scripts.ammo = './ammo.js';
+//Physijs.scripts.worker = './js/physijs_worker.js';
+//Physijs.scripts.ammo = './ammo.js';
 
 let scene;
 let camera;
@@ -16,7 +16,13 @@ let floorCube;
 let currentPiece;
 let pieceCollision;
 let collidableMeshList = [];
+let blockerMeshList = [];
 let hitCounter = 0;
+let hittingWall = false;
+let wallsHitting = [];
+let wallCollisionResults = [{object: { name: 'no'}}];
+const defaultCubeSpeed = -0.05
+let cubeSpeed = defaultCubeSpeed;
 
 // voice Recognition
 const voiceCommands = [
@@ -37,25 +43,25 @@ function spawnPiece() {
   function spawnIPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x00eaff});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(0, 0, -12);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3)
     currentPiece.updateMatrix();
     currentPiece.castShadow = true;
@@ -67,48 +73,48 @@ function spawnPiece() {
   function spawnOPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xffe100});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(-4, 0, -4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(-4, 0, 0);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
     // For making cube...unsure about keeping
-    const cube4 = new Physijs.BoxMesh(geometry, material);
+    const cube4 = new THREE.Mesh(geometry, material);
     cube4.position.set(0, 4, -4);
     cube4.castShadow = true;
     cube4.receiveShadow = true;
     cube4.updateMatrix();
 
-    const cube5 = new Physijs.BoxMesh(geometry, material);
+    const cube5 = new THREE.Mesh(geometry, material);
     cube5.position.set(-4, 4, 0);
     cube5.updateMatrix();
 
-    const cube6 = new Physijs.BoxMesh(geometry, material);
+    const cube6 = new THREE.Mesh(geometry, material);
     cube6.position.set(-4, 4, -4);
     cube6.castShadow = true;
     cube6.receiveShadow = true;
     cube6.updateMatrix();
 
-    const cube7 = new Physijs.BoxMesh(geometry, material);
+    const cube7 = new THREE.Mesh(geometry, material);
     cube7.position.set(0, 4, 0);
     cube7.castShadow = true;
     cube7.receiveShadow = true;
     cube7.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3, cube4, cube5, cube6, cube7);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
@@ -119,25 +125,25 @@ function spawnPiece() {
   function spawnTPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x6d2e8c});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
@@ -148,25 +154,25 @@ function spawnPiece() {
   function spawnSPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x37b027});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(-4, 0, 0);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, 4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(-4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
@@ -177,25 +183,25 @@ function spawnPiece() {
   function spawnZPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xc71414});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(4, 0, 0);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, 4);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, -4);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
@@ -206,25 +212,25 @@ function spawnPiece() {
   function spawnJPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x19308c});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, -8);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
@@ -236,25 +242,25 @@ function spawnPiece() {
   function spawnLPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0xde7a10});
-    const cube = new Physijs.BoxMesh(geometry, material);
+    const cube = new THREE.Mesh(geometry, material);
     cube.position.set(0, 0, -4);
     cube.castShadow = true;
     cube.receiveShadow = true;
     cube.updateMatrix();
 
-    const cube2 = new Physijs.BoxMesh(geometry, material);
+    const cube2 = new THREE.Mesh(geometry, material);
     cube2.position.set(0, 0, -8);
     cube2.castShadow = true;
     cube2.receiveShadow = true;
     cube2.updateMatrix();
 
-    const cube3 = new Physijs.BoxMesh(geometry, material);
+    const cube3 = new THREE.Mesh(geometry, material);
     cube3.position.set(4, 0, 0);
     cube3.castShadow = true;
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    currentPiece = new Physijs.BoxMesh(geometry, material);
+    currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
@@ -291,7 +297,7 @@ function setupGround() {
   // Setup placeholder floor
   const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
   const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
-  floorCube = new Physijs.BoxMesh(floorGeometry, floorMaterial, 0);
+  floorCube = new THREE.Mesh(floorGeometry, floorMaterial, 0);
   floorCube.receiveShadow = true;
   floorCube.position.y = -1;
   scene.add(floorCube);
@@ -364,43 +370,43 @@ function setupWalls() {
     transparent: true,
   });
   // Left
-  leftWallCube = new Physijs.BoxMesh(sideWallGeometry, wallMaterial, 0);
+  leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
   leftWallCube.position.x = -20;
   leftWallCube.position.y = 23;
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
   leftWallCube.name = "leftWall"
-  //collidableMeshList.push(leftWallCube);
+  blockerMeshList.push(leftWallCube);
   // Right
-  rightWallCube = new Physijs.BoxMesh(sideWallGeometry, wallMaterial, 0);
+  rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
   rightWallCube.position.x = 20;
   rightWallCube.position.y = 23;
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
   rightWallCube.name = "rightWall"
-  //collidableMeshList.push(rightWallCube);
+  blockerMeshList.push(rightWallCube);
   // south
-  northWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
-  northWallCube.position.x = 0;
-  northWallCube.position.y = 23;
-  northWallCube.position.z = 19;
-  scene.add(northWallCube);
-  northWallCube.name = "northWall"
-  //collidableMeshList.push(northWallCube);
-  // north
-  southWallCube = new Physijs.BoxMesh(poleWallGeometry, wallMaterial, 0);
+  southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
   southWallCube.position.y = 23;
-  southWallCube.position.z = -21;
+  southWallCube.position.z = 19;
   scene.add(southWallCube);
   southWallCube.name = "southWall"
-  //collidableMeshList.push(southWallCube);
+  blockerMeshList.push(southWallCube);
+  // north
+  northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
+  northWallCube.position.x = 0;
+  northWallCube.position.y = 23;
+  northWallCube.position.z = -21;
+  scene.add(northWallCube);
+  northWallCube.name = "northWall"
+  blockerMeshList.push(northWallCube);
 }
 
 // Singular function to initialize scene + rendering
 function init() {
   // Initialize scene
-  scene = new Physijs.Scene();
+  scene = new THREE.Scene();
   scene.background = new THREE.Color( 0xcce0ff );
 
   // Lights
@@ -457,30 +463,40 @@ function animate() {
   currentPiece.__dirtyPosition = true;
 
   // Attempt at handling collisions
-  var originPoint = currentPiece.position.clone();
-  for (var vertexIndex = 0; vertexIndex < currentPiece.geometry.vertices.length; vertexIndex++) {		
-		var localVertex = currentPiece.geometry.vertices[vertexIndex].clone();
-		var globalVertex = localVertex.applyMatrix4( currentPiece.matrix );
-		var directionVector = globalVertex.sub( currentPiece.position );
+  let originPoint = currentPiece.position.clone();
+  for (let vertexIndex = 0; vertexIndex < currentPiece.geometry.vertices.length; vertexIndex++) {		
+		let localVertex = currentPiece.geometry.vertices[vertexIndex].clone();
+		let globalVertex = localVertex.applyMatrix4( currentPiece.matrix );
+		let directionVector = globalVertex.sub( currentPiece.position );
 		
-		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-		var collisionResults = ray.intersectObjects( collidableMeshList );
-		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+		let ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+    let collisionResults = ray.intersectObjects(collidableMeshList);
+    wallCollisionResults = ray.intersectObjects(blockerMeshList);
+
+    if ( wallCollisionResults.length > 0 && wallCollisionResults[0].distance < directionVector.length() ) {
+      console.log('hit wall')
+      hittingWall = true;
+      console.log(wallCollisionResults)
+		} else if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
       hitCounter += 1
       console.log(" Hit ");
+      console.log(collisionResults)
       if (hitCounter > 6) {
-        pieceCollision = true;
         hitCounter = 0;
         spawnPiece();
       }
     } else {
-      pieceCollision = false;
+      hittingWall = false;
+      wallCollisionResults = [{object: { name: 'no'}}];
     };
   };
 
   // Render
-  scene.simulate();
+  //scene.simulate();
   renderer.render(scene, camera);
+  if (currentPiece) {
+    currentPiece.position.y += cubeSpeed;
+  }
 }
 
 // Ensure scene view resizes with window
@@ -499,65 +515,43 @@ function onDocumentKeyDown(event) {
   const keyCode = event.which;
   // Movement
   if (keyCode == 32) {
-    let oldVector = currentPiece.getLinearVelocity();
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + 1.5 * -10, oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3);
-    // console.log(floorCube._physijs.id)
-    // console.log(currentPiece._physijs.touches.indexOf(floorCube._physijs.id))
-    // if (currentPiece._physijs.touches.indexOf(floorCube._physijs.id) == 0) {
-    //   console.log("ground hit");
-    // }
+    cubeSpeed = -0.3
     console.log('space down');
   } else if (keyCode == 68) {
-      if (currentPiece.position.x < 12) {
-        currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
-      } else {
-        let oldVector = currentPiece.getLinearVelocity();
-        let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * 1, oldVector.y, oldVector.z);
-        currentPiece.setLinearVelocity(playerVec3)
-      }
-      // console.log(leftWallCube._physijs.id)
-      // console.log(currentPiece._physijs.touches)
-      console.log('d down');
+    if (wallCollisionResults[0].object.name != 'rightWall') {
+      currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
+    };
+    console.log('d down');
   } else if (keyCode == 65) {
-      if (currentPiece.position.x > -12) {
-        currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
-      } else {
-        let oldVector = currentPiece.getLinearVelocity();
-        let playerVec3 = new THREE.Vector3(oldVector.x + 1.5 * -1, oldVector.y, oldVector.z);
-        currentPiece.setLinearVelocity(playerVec3)
-      }
-      console.log('a down');
+    if (wallCollisionResults[0].object.name != 'leftWall') {
+      currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
+    };
+    console.log('a down');
   } else if (keyCode == 87) {
-    if (currentPiece.position.z > -4) {
+    if (wallCollisionResults[0].object.name != 'northWall') {
       currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z - 4);
-    } else {
-      let oldVector = currentPiece.getLinearVelocity();
-      let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * -1);
-      currentPiece.setLinearVelocity(playerVec3)
-    }
+    };
     console.log('w down');
   } else if (keyCode == 83) {
-    if (currentPiece.position.z < 12) {
+    if (wallCollisionResults[0].object.name != 'southWall') {
       currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + 4);
-    } else {
-      let oldVector = currentPiece.getLinearVelocity();
-      let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + 1.5 * 1);
-      currentPiece.setLinearVelocity(playerVec3)
-    }
+    };
     console.log('s down');
-    console.log(currentPiece.position)
   } else if (keyCode == 82) {
-    currentPiece.position.set(-2, 20, 1);
+    currentPiece.position.set(-2, 40, 1);
     console.log('r down');
   }
   // Rotation
   else if (keyCode == 81) {
-    currentPiece.rotation.y += Math.PI / -2;
+    if (!hittingWall) {
+      currentPiece.rotation.y += Math.PI / 2;
+    };
     console.log('q down');
   }
   else if (keyCode == 69) {
-    currentPiece.rotation.y += Math.PI / 2;
+    if (!hittingWall) {
+      currentPiece.rotation.y += Math.PI / -2;
+    };
     console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
@@ -568,33 +562,19 @@ document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
   const keyCode = event.which;
   if (keyCode == 32) {
-    let oldVector = currentPiece.getLinearVelocity();
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + -oldVector.y, oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3);
+    cubeSpeed = defaultCubeSpeed;
     console.log('space up');
   }
   else if (keyCode == 68) {
-    let oldVector = currentPiece.getLinearVelocity();
-    let playerVec3 = new THREE.Vector3(oldVector.x + -oldVector.x, oldVector.y, oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3)
     console.log('d up');
   }
   else if (keyCode == 65) {
-    let oldVector = currentPiece.getLinearVelocity();
-    let playerVec3 = new THREE.Vector3(oldVector.x + -oldVector.x, oldVector.y, oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3)
     console.log('a up');
   }
   else if (keyCode == 87) {
-    let oldVector = currentPiece.getLinearVelocity();
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + -oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3)
     console.log('w up');
   }
   else if (keyCode == 83) {
-    let oldVector = currentPiece.getLinearVelocity();
-    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y, oldVector.z + -oldVector.z);
-    currentPiece.setLinearVelocity(playerVec3)
     console.log('s up');
   }
 };
