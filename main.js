@@ -30,6 +30,10 @@ const voiceCommands = [
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
+  if (currentPiece) {
+    collidableMeshList.push(currentPiece);
+  };
+
   function spawnIPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x00eaff});
@@ -285,7 +289,7 @@ function spawnPiece() {
 // Spawn arena floor
 function setupGround() {
   // Setup placeholder floor
-  const floorGeometry = new THREE.BoxGeometry(100, 0.1, 100);
+  const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
   const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
   floorCube = new Physijs.BoxMesh(floorGeometry, floorMaterial, 0);
   floorCube.receiveShadow = true;
@@ -467,7 +471,6 @@ function animate() {
       if (hitCounter > 6) {
         pieceCollision = true;
         hitCounter = 0;
-        //collidableMeshList.push(currentPiece);
         spawnPiece();
       }
     } else {
