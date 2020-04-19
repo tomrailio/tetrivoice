@@ -514,6 +514,27 @@ function checkHit(piece) {
   return hit;
 };
 
+// Handle movement
+function movePiece(dir) {
+  let num = 1;
+  if (dir == 'left' || dir == 'north') {
+    num = -1
+  };
+  if (dir == 'left' || dir == 'right') {
+    currentPiece.position.set(currentPiece.position.x + (4 * num), currentPiece.position.y, currentPiece.position.z);
+  } else {
+    currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + (4 * num));
+  }
+};
+
+function rotatePiece(dir) {
+  let num = -2;
+  if (dir == 'left') {
+    num = 2
+  };
+  currentPiece.rotation.y += Math.PI / num;
+}
+
 // Listen for keyboard input
 document.addEventListener('keydown', onDocumentKeyDown, false);
 function onDocumentKeyDown(event) {
@@ -526,28 +547,28 @@ function onDocumentKeyDown(event) {
     if (checkHit('rightWall')) {
       console.log('hitting right wall, not moving');
     } else {
-      currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
+      movePiece('right');
     };
     console.log('d down');
   } else if (keyCode == 65) {
     if (checkHit('leftWall')) {
       console.log('hitting left wall, not moving');
     } else {
-      currentPiece.position.set(currentPiece.position.x - 4, currentPiece.position.y, currentPiece.position.z);
+      movePiece('left');
     };
     console.log('a down');
   } else if (keyCode == 87) {
     if (checkHit('northWall')) {
       console.log('hitting north wall, not moving');
     } else {
-      currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z - 4);
+      movePiece('north');
     };
     console.log('w down');
   } else if (keyCode == 83) {
     if (checkHit('southWall')) {
       console.log('hitting south wall, not moving');
     } else {
-      currentPiece.position.set(currentPiece.position.x, currentPiece.position.y, currentPiece.position.z + 4);
+      movePiece('south');
     };
     console.log('s down');
   } else if (keyCode == 82) {
@@ -557,13 +578,13 @@ function onDocumentKeyDown(event) {
   // Rotation
   else if (keyCode == 81) {
     if (!hittingWall) {
-      currentPiece.rotation.y += Math.PI / 2;
+      rotatePiece('left');
     };
     console.log('q down');
   }
   else if (keyCode == 69) {
     if (!hittingWall) {
-      currentPiece.rotation.y += Math.PI / -2;
+      rotatePiece('right');
     };
     console.log('e down');
   } else if (keyCode == 84) {
@@ -653,10 +674,10 @@ window.addEventListener('DOMContentLoaded', () => {
           console.log(matchedWord);
           if (matchedWord == voiceCommands[0]) {
             console.log("matched " + voiceCommands[0]);
-            currentPiece.rotation.y += Math.PI / -2;
+            rotatePiece('right');
           } else if (matchedWord == voiceCommands[1]) {
             console.log("matched " + voiceCommands[1])
-            currentPiece.position.set(currentPiece.position.x + 4, currentPiece.position.y, currentPiece.position.z);
+            movePiece('right');
           } else if (matchedWord == voiceCommands[2]) {
             console.log("matched " + voiceCommands[2])
             // TODO: Ensure pieces drop at same place as they land 'naturally'
