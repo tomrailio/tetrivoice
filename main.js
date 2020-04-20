@@ -69,12 +69,6 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    // const cube4 = new THREE.Mesh(geometry, material);
-    // cube4.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
-    // cube4.castShadow = true;
-    // cube4.receiveShadow = true;
-    // cube4.updateMatrix();
-
     currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3)
     currentPiece.updateMatrix();
@@ -82,27 +76,6 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
-
-    // //create a group and add the two cubes
-    // //These cubes can now be rotated / scaled etc as a group
-    // currentPiece = new THREE.Group();
-    // currentPiece.add(cube);
-    // currentPiece.add(cube2);
-    // currentPiece.add(cube3);
-    // currentPiece.add(cube4);
-    // console.log(currentPiece)
-    // currentPiece.computeBoundingBox;
-    // scene.add(currentPiece);
-    // // let currentPieceBB = new Box3(new THREE.Vector3(), new THREE.Vector3());
-    // // currentPieceBB.setFromObject(currentPiece);
-    // var helper = new THREE.BoxHelper(currentPiece, 0xff0000);
-    // helper.update();
-    // // If you want a visible bounding box
-    // scene.add(helper);
-    // // If you just want the numbers
-    // // console.log(helper.box.min);
-    // // console.log(helper.box.max);
-    
   }
 
   function spawnOPiece() {
@@ -534,14 +507,6 @@ function animate() {
   southWallCube.geometry.computeBoundingBox();
   southWallBox.setFromObject(southWallBoxHelper);
 
-  // Compute the current bounding box with the world matrix
-  //box.copy(currentPiece.geometry.boundingBox).applyMatrix4(currentPiece.matrixWorld);
-  // floorBox.copy(floorCube.geometry.boundingBox).applyMatrix4(floorCube.matrixWorld);
-  // leftWallBox.copy(leftWallCube.geometry.boundingBox).applyMatrix4(leftWallCube.matrixWorld);
-  // rightWallBox.copy(rightWallCube.geometry.boundingBox).applyMatrix4(rightWallCube.matrixWorld);
-  // northWallBox.copy(northWallCube.geometry.boundingBox).applyMatrix4(northWallCube.matrixWorld);
-  // southWallBox.copy(southWallCube.geometry.boundingBox).applyMatrix4(southWallCube.matrixWorld);
-
   if (box.intersectsBox(floorBox)) {
     console.log('hit ground')
     spawnPiece();
@@ -564,33 +529,6 @@ function animate() {
     rightWallHit = false;
   }
 
-  // Attempt at handling collisions
-  let originPoint = currentPiece.position.clone();
-  // console.log(originPoint);
-  // console.log(currentPiece.geometry.vertices)
-  // for (let vertexIndex = 0; vertexIndex < currentPiece.geometry.vertices.length; vertexIndex++) {
-  //   let localVertex = currentPiece.geometry.vertices[vertexIndex].clone();
-	// 	let globalVertex = localVertex.applyMatrix4( currentPiece.matrix );
-	// 	let directionVector = globalVertex.sub( currentPiece.position );
-		
-	// 	let ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-  //   let collisionResults = ray.intersectObjects(collidableMeshList);
-  //   wallCollisionResults = ray.intersectObjects(blockerMeshList);
-
-  //   if ( wallCollisionResults.length > 0 && wallCollisionResults[0].distance < directionVector.length() ) {
-  //     hittingWall = true;
-	// 	} else if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-  //     hitCounter += 1
-  //     if (hitCounter > 6) {
-  //       hitCounter = 0;
-  //       spawnPiece();
-  //     }
-  //   } else {
-  //     hittingWall = false;
-  //     wallCollisionResults = [{object: { name: 'no'}}];
-  //   };
-  // };
-
   // Render
   renderer.render(scene, camera);
   if (currentPiece) {
@@ -607,19 +545,6 @@ function onWindowResize() {
 
 // Listen for window resize event
 window.addEventListener('resize', onWindowResize, false);
-
-// Check if currentPiece is hitting any walls
-function checkHit(piece) {
-  let hit = false;
-
-  wallCollisionResults.forEach(function(e) {
-    if (e.object.name == piece) {
-      hit = true;
-    }
-  });
-
-  return hit;
-};
 
 // Handle movement
 function movePiece(dir) {
@@ -651,7 +576,6 @@ function onDocumentKeyDown(event) {
     cubeSpeed = -0.3
     console.log('space down');
   } else if (keyCode == 68) {
-    // if (checkHit('rightWall')) {
     if (rightWallHit) {
       console.log('hitting right wall, not moving');
     } else {
@@ -659,7 +583,6 @@ function onDocumentKeyDown(event) {
     };
     console.log('d down');
   } else if (keyCode == 65) {
-    //if (checkHit('leftWall')) {
     if (leftWallHit) {
       console.log('hitting left wall, not moving');
     } else {
@@ -667,7 +590,6 @@ function onDocumentKeyDown(event) {
     };
     console.log('a down');
   } else if (keyCode == 87) {
-    //if (checkHit('northWall')) {
     if (northWallHit) {
       console.log('hitting north wall, not moving');
     } else {
@@ -675,7 +597,6 @@ function onDocumentKeyDown(event) {
     };
     console.log('w down');
   } else if (keyCode == 83) {
-    //if (checkHit('southWall')) {
     if (southWallHit) {
       console.log('hitting south wall, not moving');
     } else {
