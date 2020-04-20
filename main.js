@@ -21,6 +21,17 @@ let wallCollisionResults = [{object: { name: ''}}];
 const defaultCubeSpeed = -0.05
 let cubeSpeed = defaultCubeSpeed;
 
+let leftWallHit = false;
+let rightWallHit = false;
+let northWallHit = false;
+let southWallHit = false;
+
+let floorBox = new THREE.Box3();
+let leftWallBox = new THREE.Box3();
+let rightWallBox = new THREE.Box3();
+let southWallBox = new THREE.Box3();
+let northWallBox = new THREE.Box3();
+
 // voice Recognition
 const voiceCommands = [
   'rotate',
@@ -58,6 +69,12 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
+    // const cube4 = new THREE.Mesh(geometry, material);
+    // cube4.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
+    // cube4.castShadow = true;
+    // cube4.receiveShadow = true;
+    // cube4.updateMatrix();
+
     currentPiece = new THREE.Mesh(geometry, material);
     currentPiece.add(cube, cube2, cube3)
     currentPiece.updateMatrix();
@@ -65,6 +82,27 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // //create a group and add the two cubes
+    // //These cubes can now be rotated / scaled etc as a group
+    // currentPiece = new THREE.Group();
+    // currentPiece.add(cube);
+    // currentPiece.add(cube2);
+    // currentPiece.add(cube3);
+    // currentPiece.add(cube4);
+    // console.log(currentPiece)
+    // currentPiece.computeBoundingBox;
+    // scene.add(currentPiece);
+    // // let currentPieceBB = new Box3(new THREE.Vector3(), new THREE.Vector3());
+    // // currentPieceBB.setFromObject(currentPiece);
+    // var helper = new THREE.BoxHelper(currentPiece, 0xff0000);
+    // helper.update();
+    // // If you want a visible bounding box
+    // scene.add(helper);
+    // // If you just want the numbers
+    // // console.log(helper.box.min);
+    // // console.log(helper.box.max);
+    
   }
 
   function spawnOPiece() {
@@ -277,16 +315,9 @@ function spawnPiece() {
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
 
-  // Attempt at handling collisions
-  currentPiece.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-    // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
-    // console.log(other_object);
-    // console.log(relative_rotation);
-    // console.log(relative_velocity);
-    // console.log(contact_normal);
-  });
-
   currentPiece.updateMatrix();
+  currentPiece.updateMatrixWorld();
+  currentPiece.updateWorldMatrix(true, true);
 }
 
 // Spawn arena floor
@@ -374,6 +405,7 @@ function setupWalls() {
   scene.add(leftWallCube);
   leftWallCube.name = "leftWall"
   blockerMeshList.push(leftWallCube);
+  leftWallCube.geometry.computeBoundingBox();
   // Right
   rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
   rightWallCube.position.x = 20;
@@ -382,6 +414,7 @@ function setupWalls() {
   scene.add(rightWallCube);
   rightWallCube.name = "rightWall"
   blockerMeshList.push(rightWallCube);
+  rightWallCube.geometry.computeBoundingBox();
   // south
   southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
@@ -390,6 +423,7 @@ function setupWalls() {
   scene.add(southWallCube);
   southWallCube.name = "southWall"
   blockerMeshList.push(southWallCube);
+  southWallCube.geometry.computeBoundingBox();
   // north
   northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
@@ -398,6 +432,7 @@ function setupWalls() {
   scene.add(northWallCube);
   northWallCube.name = "northWall"
   blockerMeshList.push(northWallCube);
+  northWallCube.geometry.computeBoundingBox();
 }
 
 // Singular function to initialize scene + rendering
@@ -443,7 +478,7 @@ function init() {
 
   // Setup controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enabled = false;
+  controls.enabled = true;
 
   // Spawn arena geometry
   setupGround();
@@ -456,33 +491,105 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
-  currentPiece.__dirtyRotation = true;
-  currentPiece.__dirtyPosition = true;
+  // Tetromino
+  var boxHelper = new THREE.BoxHelper(currentPiece, 0xff0000);
+  boxHelper.update();
+  var box = new THREE.Box3();
+  currentPiece.geometry.computeBoundingBox();
+  box.setFromObject(boxHelper)
+  boxHelper.visible = true;
+  // If you want a visible bounding box
+  // scene.add(boxHelper);
+  // console.log(helper) // Logs coordinates
+
+  // Ground
+  let floorBoxHelper = new THREE.BoxHelper(floorCube, 0xff0000);
+  floorBoxHelper.update();
+  let floorBox = new THREE.Box3();
+  floorCube.geometry.computeBoundingBox();
+  floorBox.setFromObject(floorBoxHelper);
+
+  // Walls
+  let leftWallBoxHelper = new THREE.BoxHelper(leftWallCube, 0xff0000);
+  leftWallBoxHelper.update();
+  let leftWallBox = new THREE.Box3();
+  leftWallCube.geometry.computeBoundingBox();
+  leftWallBox.setFromObject(leftWallBoxHelper);
+
+  let rightWallBoxHelper = new THREE.BoxHelper(rightWallCube, 0xff0000);
+  rightWallBoxHelper.update();
+  let rightWallBox = new THREE.Box3();
+  rightWallCube.geometry.computeBoundingBox();
+  rightWallBox.setFromObject(rightWallBoxHelper);
+
+  let northWallBoxHelper = new THREE.BoxHelper(northWallCube, 0xff0000);
+  northWallBoxHelper.update();
+  let northWallBox = new THREE.Box3();
+  northWallCube.geometry.computeBoundingBox();
+  northWallBox.setFromObject(northWallBoxHelper);
+
+  let southWallBoxHelper = new THREE.BoxHelper(southWallCube, 0xff0000);
+  southWallBoxHelper.update();
+  let southWallBox = new THREE.Box3();
+  southWallCube.geometry.computeBoundingBox();
+  southWallBox.setFromObject(southWallBoxHelper);
+
+  // Compute the current bounding box with the world matrix
+  //box.copy(currentPiece.geometry.boundingBox).applyMatrix4(currentPiece.matrixWorld);
+  // floorBox.copy(floorCube.geometry.boundingBox).applyMatrix4(floorCube.matrixWorld);
+  // leftWallBox.copy(leftWallCube.geometry.boundingBox).applyMatrix4(leftWallCube.matrixWorld);
+  // rightWallBox.copy(rightWallCube.geometry.boundingBox).applyMatrix4(rightWallCube.matrixWorld);
+  // northWallBox.copy(northWallCube.geometry.boundingBox).applyMatrix4(northWallCube.matrixWorld);
+  // southWallBox.copy(southWallCube.geometry.boundingBox).applyMatrix4(southWallCube.matrixWorld);
+
+  if (box.intersectsBox(floorBox)) {
+    console.log('hit ground')
+    spawnPiece();
+  } else if (box.intersectsBox(leftWallBox)) {
+    leftWallHit = true;
+    console.log('hit left wall');
+  } else if (box.intersectsBox(rightWallBox)) {
+    rightWallHit = true;
+    console.log('hit right wall');
+  } else if (box.intersectsBox(southWallBox)) {
+    southWallHit = true;
+    console.log('hit south wall');
+  } else if (box.intersectsBox(northWallBox)) {
+    northWallHit = true;
+    console.log('hit north wall');
+  } else {
+    northWallHit = false;
+    southWallHit = false;
+    leftWallHit = false;
+    rightWallHit = false;
+  }
 
   // Attempt at handling collisions
   let originPoint = currentPiece.position.clone();
-  for (let vertexIndex = 0; vertexIndex < currentPiece.geometry.vertices.length; vertexIndex++) {		
-		let localVertex = currentPiece.geometry.vertices[vertexIndex].clone();
-		let globalVertex = localVertex.applyMatrix4( currentPiece.matrix );
-		let directionVector = globalVertex.sub( currentPiece.position );
+  // console.log(originPoint);
+  // console.log(currentPiece.geometry.vertices)
+  // for (let vertexIndex = 0; vertexIndex < currentPiece.geometry.vertices.length; vertexIndex++) {
+  //   let localVertex = currentPiece.geometry.vertices[vertexIndex].clone();
+	// 	let globalVertex = localVertex.applyMatrix4( currentPiece.matrix );
+	// 	let directionVector = globalVertex.sub( currentPiece.position );
 		
-		let ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-    let collisionResults = ray.intersectObjects(collidableMeshList);
-    wallCollisionResults = ray.intersectObjects(blockerMeshList);
+	// 	let ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+  //   let collisionResults = ray.intersectObjects(collidableMeshList);
+  //   wallCollisionResults = ray.intersectObjects(blockerMeshList);
 
-    if ( wallCollisionResults.length > 0 && wallCollisionResults[0].distance < directionVector.length() ) {
-      hittingWall = true;
-		} else if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
-      hitCounter += 1
-      if (hitCounter > 6) {
-        hitCounter = 0;
-        spawnPiece();
-      }
-    } else {
-      hittingWall = false;
-      wallCollisionResults = [{object: { name: 'no'}}];
-    };
-  };
+  //   if ( wallCollisionResults.length > 0 && wallCollisionResults[0].distance < directionVector.length() ) {
+  //     hittingWall = true;
+	// 	} else if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) {
+  //     hitCounter += 1
+  //     if (hitCounter > 6) {
+  //       hitCounter = 0;
+  //       spawnPiece();
+  //     }
+  //   } else {
+  //     hittingWall = false;
+  //     wallCollisionResults = [{object: { name: 'no'}}];
+  //   };
+  // };
 
   // Render
   renderer.render(scene, camera);
@@ -544,28 +651,32 @@ function onDocumentKeyDown(event) {
     cubeSpeed = -0.3
     console.log('space down');
   } else if (keyCode == 68) {
-    if (checkHit('rightWall')) {
+    // if (checkHit('rightWall')) {
+    if (rightWallHit) {
       console.log('hitting right wall, not moving');
     } else {
       movePiece('right');
     };
     console.log('d down');
   } else if (keyCode == 65) {
-    if (checkHit('leftWall')) {
+    //if (checkHit('leftWall')) {
+    if (leftWallHit) {
       console.log('hitting left wall, not moving');
     } else {
       movePiece('left');
     };
     console.log('a down');
   } else if (keyCode == 87) {
-    if (checkHit('northWall')) {
+    //if (checkHit('northWall')) {
+    if (northWallHit) {
       console.log('hitting north wall, not moving');
     } else {
       movePiece('north');
     };
     console.log('w down');
   } else if (keyCode == 83) {
-    if (checkHit('southWall')) {
+    //if (checkHit('southWall')) {
+    if (southWallHit) {
       console.log('hitting south wall, not moving');
     } else {
       movePiece('south');
