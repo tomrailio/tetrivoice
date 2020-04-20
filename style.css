@@ -31,7 +31,7 @@ canvas {
   text-align: center;
   z-index: 100;
   display: block;
-  font-family: tetrominoes;
+  font-family: Tetrominoes Regular;
   font-size: 50px;
 }
 .anchor{
@@ -40,10 +40,6 @@ canvas {
   margin-top: -115px; /*same height as header*/
   visibility: hidden;
 }
-@font-face {
-  font-family: tetrominoes;
-  src: url(./misc/fonts/tetrominoes.ttf);
-}
 #voiceComs {
   position: absolute;
   top: 250px;
@@ -51,6 +47,7 @@ canvas {
   text-align: right;
   z-index: 100;
   display: block;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #keyBinds {
   position: absolute;
@@ -60,6 +57,7 @@ canvas {
   z-index: 100;
   display: block;
   margin-left: 20px;
+  font-family: Arial, Helvetica, sans-serif;
 }
 #text {
   position: absolute;
