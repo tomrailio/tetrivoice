@@ -9,28 +9,27 @@ let renderer;
 
 const spawnCord = new THREE.Vector3(-2, 40, 1);
 const gridSize = 4;
-let floorCube;
-let currentPiece;
-let pieceCollision;
-let collidableMeshList = [];
-let blockerMeshList = [];
-let hitCounter = 0;
-let hittingWall = false;
-let wallsHitting = [];
-let wallCollisionResults = [{object: { name: ''}}];
 const defaultCubeSpeed = -0.05
 let cubeSpeed = defaultCubeSpeed;
 
-let leftWallHit = false;
-let rightWallHit = false;
-let northWallHit = false;
-let southWallHit = false;
+let currentPiece;
+let floorCube;
+let leftWallCube;
+let rightWallCube;
+let northWallCube;
+let southWallCube;
 
 let floorBox = new THREE.Box3();
 let leftWallBox = new THREE.Box3();
 let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
+
+let hittingWall = false;
+let leftWallHit = false;
+let rightWallHit = false;
+let northWallHit = false;
+let southWallHit = false;
 
 // voice Recognition
 const voiceCommands = [
@@ -44,10 +43,6 @@ const voiceCommands = [
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
-  if (currentPiece) {
-    collidableMeshList.push(currentPiece);
-  };
-
   function spawnIPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x00eaff});
@@ -303,7 +298,6 @@ function setupGround() {
   floorCube.position.y = -1;
   scene.add(floorCube);
   floorCube.name = "ground"
-  collidableMeshList.push(floorCube);
 
   // Draw floor grid
   const lineMaterial = new THREE.MeshPhongMaterial({
@@ -377,7 +371,6 @@ function setupWalls() {
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
   leftWallCube.name = "leftWall"
-  blockerMeshList.push(leftWallCube);
   leftWallCube.geometry.computeBoundingBox();
   // Right
   rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
@@ -386,7 +379,6 @@ function setupWalls() {
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
   rightWallCube.name = "rightWall"
-  blockerMeshList.push(rightWallCube);
   rightWallCube.geometry.computeBoundingBox();
   // south
   southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
@@ -395,7 +387,6 @@ function setupWalls() {
   southWallCube.position.z = 19;
   scene.add(southWallCube);
   southWallCube.name = "southWall"
-  blockerMeshList.push(southWallCube);
   southWallCube.geometry.computeBoundingBox();
   // north
   northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
@@ -404,7 +395,6 @@ function setupWalls() {
   northWallCube.position.z = -21;
   scene.add(northWallCube);
   northWallCube.name = "northWall"
-  blockerMeshList.push(northWallCube);
   northWallCube.geometry.computeBoundingBox();
 }
 
