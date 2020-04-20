@@ -12,6 +12,14 @@ const gridSize = 4;
 const defaultCubeSpeed = -0.05
 let cubeSpeed = defaultCubeSpeed;
 
+const voiceCommands = [
+  'rotate',
+  'move',
+  'drop',
+  'swap',
+  'spawn'
+];
+
 let currentPiece;
 let floorCube;
 let leftWallCube;
@@ -30,15 +38,6 @@ let leftWallHit = false;
 let rightWallHit = false;
 let northWallHit = false;
 let southWallHit = false;
-
-// voice Recognition
-const voiceCommands = [
-  'rotate',
-  'move',
-  'drop',
-  'swap',
-  'spawn'
-];
 
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
@@ -497,26 +496,34 @@ function animate() {
   southWallCube.geometry.computeBoundingBox();
   southWallBox.setFromObject(southWallBoxHelper);
 
+  // Detect piece collisions
   if (box.intersectsBox(floorBox)) {
     console.log('hit ground')
     spawnPiece();
-  } else if (box.intersectsBox(leftWallBox)) {
+  }
+  if (box.intersectsBox(leftWallBox)) {
     leftWallHit = true;
     console.log('hit left wall');
-  } else if (box.intersectsBox(rightWallBox)) {
+  } else {
+    leftWallHit = false;
+  }
+  if (box.intersectsBox(rightWallBox)) {
     rightWallHit = true;
     console.log('hit right wall');
-  } else if (box.intersectsBox(southWallBox)) {
+  } else {
+    rightWallHit = false;
+  }
+  if (box.intersectsBox(southWallBox)) {
     southWallHit = true;
     console.log('hit south wall');
-  } else if (box.intersectsBox(northWallBox)) {
+  } else {
+    southWallHit = false;
+  }
+  if (box.intersectsBox(northWallBox)) {
     northWallHit = true;
     console.log('hit north wall');
   } else {
     northWallHit = false;
-    southWallHit = false;
-    leftWallHit = false;
-    rightWallHit = false;
   }
 
   // Render
