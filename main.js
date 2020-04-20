@@ -565,6 +565,21 @@ function animate() {
   renderer.render(scene, camera);
 }
 
+// Calculate user FPS
+// https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe/19772220#19772220
+let stop = false;
+let frameCount = 0;
+//let $results = $("#results");
+let fps, fpsInterval, startTime, now, then, elapsed;
+
+// initialize the timer variables and start the animation
+function startAnimating(fps) {
+  fpsInterval = 1000 / fps;
+  then = Date.now();
+  startTime = then;
+  animate();
+}
+
 // Ensure scene view resizes with window
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -702,7 +717,7 @@ window.addEventListener('DOMContentLoaded', () => {
       button.hidden = true;
       music.play();
       init();
-      animate();
+      startAnimating(60);
     };
 
     const onResult = (event) => {
