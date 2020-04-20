@@ -468,108 +468,10 @@ function init() {
   spawnPiece();
 }
 
-// Animate scene
-function animate() {
-  requestAnimationFrame(animate);
-
-  // Control block falling speed
-  let oldVector = currentPiece.getLinearVelocity();
-  let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + (-oldVector.y - cubeSpeed), oldVector.z);
-  currentPiece.setLinearVelocity(playerVec3);
-
-  currentPiece.__dirtyRotation = true;
-  currentPiece.__dirtyPosition = true;
-
-  currentPiece.rotation.y = currRotY;
-  currentPiece.rotation.z = 0;
-  currentPiece.rotation.x = 0;
-
-  currentPiece.position.z = currPosZ;
-  currentPiece.position.x = currPosX;
-
-  // Tetromino
-  var boxHelper = new THREE.BoxHelper(currentPiece, 0xff0000);
-  boxHelper.update();
-  var box = new THREE.Box3();
-  currentPiece.geometry.computeBoundingBox();
-  box.setFromObject(boxHelper)
-  boxHelper.visible = true;
-  // If you want a visible bounding box
-  // scene.add(boxHelper);
-  // console.log(helper) // Logs coordinates
-
-  // Ground
-  let floorBoxHelper = new THREE.BoxHelper(floorCube, 0xff0000);
-  floorBoxHelper.update();
-  let floorBox = new THREE.Box3();
-  floorCube.geometry.computeBoundingBox();
-  floorBox.setFromObject(floorBoxHelper);
-
-  // Walls
-  let leftWallBoxHelper = new THREE.BoxHelper(leftWallCube, 0xff0000);
-  leftWallBoxHelper.update();
-  let leftWallBox = new THREE.Box3();
-  leftWallCube.geometry.computeBoundingBox();
-  leftWallBox.setFromObject(leftWallBoxHelper);
-
-  let rightWallBoxHelper = new THREE.BoxHelper(rightWallCube, 0xff0000);
-  rightWallBoxHelper.update();
-  let rightWallBox = new THREE.Box3();
-  rightWallCube.geometry.computeBoundingBox();
-  rightWallBox.setFromObject(rightWallBoxHelper);
-
-  let northWallBoxHelper = new THREE.BoxHelper(northWallCube, 0xff0000);
-  northWallBoxHelper.update();
-  let northWallBox = new THREE.Box3();
-  northWallCube.geometry.computeBoundingBox();
-  northWallBox.setFromObject(northWallBoxHelper);
-
-  let southWallBoxHelper = new THREE.BoxHelper(southWallCube, 0xff0000);
-  southWallBoxHelper.update();
-  let southWallBox = new THREE.Box3();
-  southWallCube.geometry.computeBoundingBox();
-  southWallBox.setFromObject(southWallBoxHelper);
-
-  // Detect piece collisions
-  if (box.intersectsBox(floorBox)) {
-    console.log('hit ground')
-    spawnPiece();
-  }
-  if (box.intersectsBox(leftWallBox)) {
-    leftWallHit = true;
-    console.log('hit left wall');
-  } else {
-    leftWallHit = false;
-  }
-  if (box.intersectsBox(rightWallBox)) {
-    rightWallHit = true;
-    console.log('hit right wall');
-  } else {
-    rightWallHit = false;
-  }
-  if (box.intersectsBox(southWallBox)) {
-    southWallHit = true;
-    console.log('hit south wall');
-  } else {
-    southWallHit = false;
-  }
-  if (box.intersectsBox(northWallBox)) {
-    northWallHit = true;
-    console.log('hit north wall');
-  } else {
-    northWallHit = false;
-  }
-
-  // Render
-  scene.simulate(); // run physics
-  renderer.render(scene, camera);
-}
-
 // Calculate user FPS
 // https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe/19772220#19772220
 let stop = false;
 let frameCount = 0;
-//let $results = $("#results");
 let fps, fpsInterval, startTime, now, then, elapsed;
 
 // initialize the timer variables and start the animation
@@ -577,7 +479,113 @@ function startAnimating(fps) {
   fpsInterval = 1000 / fps;
   then = Date.now();
   startTime = then;
+  console.log('start time: ' + startTime);
   animate();
+}
+
+// Animate scene
+function animate() {
+  requestAnimationFrame(animate);
+  now = Date.now();
+  elapsed = now - then;
+
+  if (elapsed > fpsInterval) {
+    // Get ready for next frame by setting then=now, but...
+    // Also, adjust for fpsInterval not being multiple of 16.67
+    then = now - (elapsed % fpsInterval);
+
+    // Control block falling speed
+    let oldVector = currentPiece.getLinearVelocity();
+    let playerVec3 = new THREE.Vector3(oldVector.x, oldVector.y + (-oldVector.y - cubeSpeed), oldVector.z);
+    currentPiece.setLinearVelocity(playerVec3);
+
+    currentPiece.__dirtyRotation = true;
+    currentPiece.__dirtyPosition = true;
+
+    currentPiece.rotation.y = currRotY;
+    currentPiece.rotation.z = 0;
+    currentPiece.rotation.x = 0;
+
+    currentPiece.position.z = currPosZ;
+    currentPiece.position.x = currPosX;
+
+    // Tetromino
+    var boxHelper = new THREE.BoxHelper(currentPiece, 0xff0000);
+    boxHelper.update();
+    var box = new THREE.Box3();
+    currentPiece.geometry.computeBoundingBox();
+    box.setFromObject(boxHelper)
+    boxHelper.visible = true;
+    // If you want a visible bounding box
+    // scene.add(boxHelper);
+    // console.log(helper) // Logs coordinates
+
+    // Ground
+    let floorBoxHelper = new THREE.BoxHelper(floorCube, 0xff0000);
+    floorBoxHelper.update();
+    let floorBox = new THREE.Box3();
+    floorCube.geometry.computeBoundingBox();
+    floorBox.setFromObject(floorBoxHelper);
+
+    // Walls
+    let leftWallBoxHelper = new THREE.BoxHelper(leftWallCube, 0xff0000);
+    leftWallBoxHelper.update();
+    let leftWallBox = new THREE.Box3();
+    leftWallCube.geometry.computeBoundingBox();
+    leftWallBox.setFromObject(leftWallBoxHelper);
+
+    let rightWallBoxHelper = new THREE.BoxHelper(rightWallCube, 0xff0000);
+    rightWallBoxHelper.update();
+    let rightWallBox = new THREE.Box3();
+    rightWallCube.geometry.computeBoundingBox();
+    rightWallBox.setFromObject(rightWallBoxHelper);
+
+    let northWallBoxHelper = new THREE.BoxHelper(northWallCube, 0xff0000);
+    northWallBoxHelper.update();
+    let northWallBox = new THREE.Box3();
+    northWallCube.geometry.computeBoundingBox();
+    northWallBox.setFromObject(northWallBoxHelper);
+
+    let southWallBoxHelper = new THREE.BoxHelper(southWallCube, 0xff0000);
+    southWallBoxHelper.update();
+    let southWallBox = new THREE.Box3();
+    southWallCube.geometry.computeBoundingBox();
+    southWallBox.setFromObject(southWallBoxHelper);
+
+    // Detect piece collisions
+    if (box.intersectsBox(floorBox)) {
+      console.log('hit ground')
+      spawnPiece();
+    }
+    if (box.intersectsBox(leftWallBox)) {
+      leftWallHit = true;
+      console.log('hit left wall');
+    } else {
+      leftWallHit = false;
+    }
+    if (box.intersectsBox(rightWallBox)) {
+      rightWallHit = true;
+      console.log('hit right wall');
+    } else {
+      rightWallHit = false;
+    }
+    if (box.intersectsBox(southWallBox)) {
+      southWallHit = true;
+      console.log('hit south wall');
+    } else {
+      southWallHit = false;
+    }
+    if (box.intersectsBox(northWallBox)) {
+      northWallHit = true;
+      console.log('hit north wall');
+    } else {
+      northWallHit = false;
+    }
+
+    // Render
+    scene.simulate(); // run physics
+    renderer.render(scene, camera);
+  }
 }
 
 // Ensure scene view resizes with window
