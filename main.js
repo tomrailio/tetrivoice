@@ -644,6 +644,11 @@ function onDocumentKeyUp(event) {
 
 // Handle microphone input
 window.addEventListener('DOMContentLoaded', () => {
+  // Initialize music player controls
+  var music = document.getElementById('soundtrack');
+  music.volume = 0.05;
+  music.controls = true;
+
   const button = document.getElementById("button");
   const main = document.getElementsByTagName("main")[0];
   let listening = false;
@@ -663,6 +668,7 @@ window.addEventListener('DOMContentLoaded', () => {
       recognition.start();
       button.textContent = "Stop listening";
       button.hidden = true;
+      music.play();
       init();
       animate();
     };

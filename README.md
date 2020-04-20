@@ -1,5 +1,12 @@
 # TETRIVOICE: TETRIS OF THE FUTURE
+A variation of Tetris built in 3D played with your voice.
 
-This repository hosts Tetrivoix; a game that will pioneer a path forward in videogames on a scale never seen before. Combining crisp three-dimensional graphics with the power of voice, Tetrivoix breaks the physical barrier between you and the game. No longer are you restrained to your human bodies and slow physical reaction times. Now you can tell your game exactly what you want it to do. 
+#### Libraries Used
+---
+* [Three.js](https://threejs.org/)
+* [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API)
+* [Physijs](https://chandlerprall.github.io/Physijs/) (for physics mode)
 
-I, the brilliant creator of Tetrivoix, am humbly and amicably giving away the source code to this game of no cost to you. While I could make millions of dollars if I were to merchandise it, I believe that it is imperative that the public have access to this powerful, landscape changing piece of technology. Please use responsibly; I cannot and will not be held accountable for any negative or positive effects this technology has on you or your equipment (no matter how vast of a fortune you stand to gain).
+#### Music
+---
+[Game Tunes by Various Artists (Enough Records)](https://archive.org/details/Game_Tunes-14289/).
