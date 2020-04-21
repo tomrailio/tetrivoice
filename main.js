@@ -741,11 +741,22 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const button = document.getElementById("button");
   const main = document.getElementsByTagName("main")[0];
+
   let listening = false;
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+  const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+  let grammar = '#JSGF V1.0; grammar movements; public <movement> = move | rotate | drop | spawn ;'
+
   if (typeof SpeechRecognition !== "undefined") {
     const recognition = new SpeechRecognition();
+    speechRecognitionList = new SpeechGrammarList();
+    speechRecognitionList.addFromString(grammar, 1);
+    recognition.grammars = speechRecognitionList;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 0;
 
     const stop = () => {
       main.classList.remove("speaking");
@@ -803,12 +814,8 @@ window.addEventListener('DOMContentLoaded', () => {
               rotatePiece('right');
             } else if (leftDown) {
               rotatePiece('left');
-            } else if (northDown) {
-              rotatePiece('north');
-            } else if (southDown) {
-              rotatePiece('south');
             } else {
-              console.log('no direction specified');
+              console.log('no rotate direction specified');
             }
           } else if (matchedWord == voiceCommands[1]) {
             console.log("matched " + voiceCommands[1])
@@ -821,7 +828,7 @@ window.addEventListener('DOMContentLoaded', () => {
             } else if (southDown) {
               movePiece('south');
             } else {
-              console.log('no direction specified');
+              console.log('no move direction specified');
             }
           } else if (matchedWord == voiceCommands[2]) {
             console.log("matched " + voiceCommands[2])
@@ -846,7 +853,7 @@ window.addEventListener('DOMContentLoaded', () => {
     button.addEventListener("click", event => {
       listening ? stop() : start();
       listening = !listening;
-    });
+      });
   } else {
     button.remove();
     const message = document.getElementById("message");
