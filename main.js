@@ -12,7 +12,7 @@ let renderer;
 
 const spawnCord = new THREE.Vector3(-2, 40, 1);
 const gridSize = 4;
-const defaultCubeSpeed = 5;
+const defaultCubeSpeed = 2.5;
 let cubeSpeed = defaultCubeSpeed;
 
 const voiceCommands = [
@@ -44,6 +44,11 @@ let leftWallHit = false;
 let rightWallHit = false;
 let northWallHit = false;
 let southWallHit = false;
+
+let leftDown = false;
+let rightDown = false;
+let northDown = false;
+let southDown = false;
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -468,18 +473,18 @@ function init() {
   spawnPiece();
 }
 
-// Calculate user FPS
+// Control animation FPS
 // https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe/19772220#19772220
 let stop = false;
 let frameCount = 0;
 let fps, fpsInterval, startTime, now, then, elapsed;
 
-// initialize the timer variables and start the animation
+// Initialize the timer variables and start the animation
 function startAnimating(fps) {
   fpsInterval = 1000 / fps;
   then = Date.now();
   startTime = then;
-  console.log('start time: ' + startTime);
+  // console.log('start time: ' + startTime);
   animate();
 }
 
@@ -631,15 +636,19 @@ function onDocumentKeyDown(event) {
     if (rightWallHit) {
       console.log('hitting right wall, not moving');
     } else {
-      movePiece('right');
+      //movePiece('right');
     };
+    document.getElementById('voiceComs').style.backgroundColor = '#ebe834';
+    rightDown = true;
     console.log('d down');
   } else if (keyCode == 65) {
     if (leftWallHit) {
       console.log('hitting left wall, not moving');
     } else {
-      movePiece('left');
+      //movePiece('left');
     };
+    document.getElementById('keyBinds').style.backgroundColor = '#ebe834';
+    leftDown = true;
     console.log('a down');
   } else if (keyCode == 87) {
     if (northWallHit) {
@@ -647,6 +656,7 @@ function onDocumentKeyDown(event) {
     } else {
       movePiece('north');
     };
+    northDown = true;
     console.log('w down');
   } else if (keyCode == 83) {
     if (southWallHit) {
@@ -654,6 +664,7 @@ function onDocumentKeyDown(event) {
     } else {
       movePiece('south');
     };
+    southDown = true;
     console.log('s down');
   } else if (keyCode == 82) {
     currentPiece.position.set(-2, 40, 1);
@@ -662,14 +673,32 @@ function onDocumentKeyDown(event) {
   // Rotation
   else if (keyCode == 81) {
     if (!hittingWall) {
-      rotatePiece('left');
+      // Attempt at cloning piece to test collision...
+      // let testpiece = currentPiece.clone();
+      // testpiece.rotation.y = Math.PI / -2;
+      // testpiece.transparent = true;
+      // console.log(testpiece)
+      // scene.add(testpiece)
+      //   testpiece.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+      //     if (other_object.name == 'leftWall') {
+      //       console.log('testpiece hit wall, deleting piece and not rotating');
+      //       scene.remove(testpiece)
+      //     } else {
+      //       scene.remove(testpiece)
+      //       rotatePiece('left');
+      //     }
+      //     // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
+      // });
+      // rotatePiece('left');
     };
+    leftDown = true;
     console.log('q down');
   }
   else if (keyCode == 69) {
     if (!hittingWall) {
-      rotatePiece('right');
+      // rotatePiece('right');
     };
+    rightDown = true;
     console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
@@ -684,16 +713,22 @@ function onDocumentKeyUp(event) {
     console.log('space up');
   }
   else if (keyCode == 68) {
+    document.getElementById('voiceComs').style.backgroundColor = 'transparent';
     console.log('d up');
+    rightDown = false;
   }
   else if (keyCode == 65) {
+    document.getElementById('keyBinds').style.backgroundColor = 'transparent';
     console.log('a up');
+    leftDown = false;
   }
   else if (keyCode == 87) {
     console.log('w up');
+    northDown = false;
   }
   else if (keyCode == 83) {
     console.log('s up');
+    southDown = false;
   }
 };
 
@@ -733,7 +768,7 @@ window.addEventListener('DOMContentLoaded', () => {
         // Try to filter rapid voice results
         if (res.isFinal) {
           speechSynthesis.pause();
-          console.log(res);
+          // console.log(res);
           let matchedWord = res[0].transcript.trim().split(' ');
           if (matchedWord.length != 0) {
             matchedWord = matchedWord.sort();
@@ -750,7 +785,7 @@ window.addEventListener('DOMContentLoaded', () => {
           countsArr.sort(function(a, b) {
               return a[1] - b[1];
           });          
-            console.log(countsArr);
+            // console.log(countsArr);
             for (let arr in countsArr) {
               if (countsArr[arr][1] > newBig) {
                 newBig = arr;
@@ -761,13 +796,33 @@ window.addEventListener('DOMContentLoaded', () => {
             matchedWord = countsArr[newBig][0];
           }
 
-          console.log(matchedWord);
+          // console.log(matchedWord);
           if (matchedWord == voiceCommands[0]) {
             console.log("matched " + voiceCommands[0]);
-            rotatePiece('right');
+            if (rightDown) {
+              rotatePiece('right');
+            } else if (leftDown) {
+              rotatePiece('left');
+            } else if (northDown) {
+              rotatePiece('north');
+            } else if (southDown) {
+              rotatePiece('south');
+            } else {
+              console.log('no direction specified');
+            }
           } else if (matchedWord == voiceCommands[1]) {
             console.log("matched " + voiceCommands[1])
-            movePiece('right');
+            if (rightDown) {
+              movePiece('right');
+            } else if (leftDown) {
+              movePiece('left');
+            } else if (northDown) {
+              movePiece('north');
+            } else if (southDown) {
+              movePiece('south');
+            } else {
+              console.log('no direction specified');
+            }
           } else if (matchedWord == voiceCommands[2]) {
             console.log("matched " + voiceCommands[2])
             // TODO: Ensure pieces drop at same place as they land 'naturally'
