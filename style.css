@@ -71,6 +71,15 @@ canvas {
   display: block;
   font-family: Arial, Helvetica, sans-serif;
 }
+.startText {
+  position: absolute;
+  top: 250px;
+  width: 100%;
+  text-align: center;
+  z-index: 100;
+  display: block;
+  font-family: Arial, Helvetica, sans-serif;
+}
 button {
   font-size: 18px;
   font-weight: 200;

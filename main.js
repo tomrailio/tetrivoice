@@ -641,7 +641,7 @@ function onDocumentKeyDown(event) {
       //movePiece('right');
       rightDown = true;
     };
-    document.getElementById('voiceComs').style.backgroundColor = '#ebe834';
+    document.getElementById('rightArrow').style.backgroundColor = '#ebe834';
     //console.log('d down');
   } else if (keyCode == 65) {
     if (leftWallHit) {
@@ -651,7 +651,7 @@ function onDocumentKeyDown(event) {
       //movePiece('left');
       leftDown = true;
     };
-    document.getElementById('keyBinds').style.backgroundColor = '#ebe834';
+    document.getElementById('leftArrow').style.backgroundColor = '#ebe834';
     //console.log('a down');
   } else if (keyCode == 87) {
     if (northWallHit) {
@@ -661,6 +661,7 @@ function onDocumentKeyDown(event) {
       //movePiece('north');
       northDown = true;
     };
+    document.getElementById('upArrow').style.backgroundColor = '#ebe834';
     //console.log('w down');
   } else if (keyCode == 83) {
     if (southWallHit) {
@@ -670,6 +671,7 @@ function onDocumentKeyDown(event) {
       //movePiece('south');
       southDown = true;
     };
+    document.getElementById('downArrow').style.backgroundColor = '#ebe834';
     //console.log('s down');
   } else if (keyCode == 82) {
     currentPiece.position.set(-2, 40, 1);
@@ -722,20 +724,22 @@ function onDocumentKeyUp(event) {
     //console.log('space up');
   }
   else if (keyCode == 68) {
-    document.getElementById('voiceComs').style.backgroundColor = 'transparent';
+    document.getElementById('rightArrow').style.backgroundColor = 'transparent';
     //console.log('d up');
     rightDown = false;
   }
   else if (keyCode == 65) {
-    document.getElementById('keyBinds').style.backgroundColor = 'transparent';
+    document.getElementById('leftArrow').style.backgroundColor = 'transparent';
     //console.log('a up');
     leftDown = false;
   }
   else if (keyCode == 87) {
+    document.getElementById('upArrow').style.backgroundColor = 'transparent';
     //console.log('w up');
     northDown = false;
   }
   else if (keyCode == 83) {
+    document.getElementById('downArrow').style.backgroundColor = 'transparent';
     //console.log('s up');
     southDown = false;
   }
@@ -859,6 +863,10 @@ window.addEventListener('DOMContentLoaded', () => {
     recognition.interimResults = true;
     recognition.addEventListener("result", onResult);
     button.addEventListener("click", event => {
+      const startMessage = document.getElementById("startText");
+      startMessage.style.display = "none"
+      // startMessage.setAttribute("aria-hidden", "true");
+      // startMessage.setAttribute("hidden", "true");
       listening ? stop() : start();
       listening = !listening;
       });
@@ -867,5 +875,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const message = document.getElementById("message");
     message.removeAttribute("hidden");
     message.setAttribute("aria-hidden", "false");
+    const startMessage = document.getElementById("startText");
+    startMessage.style.display = "none"
   }
 });
