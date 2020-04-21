@@ -635,37 +635,41 @@ function onDocumentKeyDown(event) {
     console.log('space down');
   } else if (keyCode == 68) {
     if (rightWallHit) {
+      rightDown = false;
       console.log('hitting right wall, not moving');
     } else {
       //movePiece('right');
+      rightDown = true;
     };
     document.getElementById('voiceComs').style.backgroundColor = '#ebe834';
-    rightDown = true;
     //console.log('d down');
   } else if (keyCode == 65) {
     if (leftWallHit) {
+      leftDown = false;
       console.log('hitting left wall, not moving');
     } else {
       //movePiece('left');
+      leftDown = true;
     };
     document.getElementById('keyBinds').style.backgroundColor = '#ebe834';
-    leftDown = true;
     //console.log('a down');
   } else if (keyCode == 87) {
-    // if (northWallHit) {
-    //   //console.log('hitting north wall, not moving');
-    // } else {
-    //   //movePiece('north');
-    // };
-    northDown = true;
+    if (northWallHit) {
+      northDown = false;
+      console.log('hitting north wall, not moving');
+    } else {
+      //movePiece('north');
+      northDown = true;
+    };
     //console.log('w down');
   } else if (keyCode == 83) {
-    // if (southWallHit) {
-    //   //console.log('hitting south wall, not moving');
-    // } else {
-    //   //movePiece('south');
-    // };
-    southDown = true;
+    if (southWallHit) {
+      southDown = false;
+      console.log('hitting south wall, not moving');
+    } else {
+      //movePiece('south');
+      southDown = true;
+    };
     //console.log('s down');
   } else if (keyCode == 82) {
     currentPiece.position.set(-2, 40, 1);
@@ -674,6 +678,7 @@ function onDocumentKeyDown(event) {
   // Rotation
   else if (keyCode == 81) {
     if (!hittingWall) {
+      leftDown = true;
       // Attempt at cloning piece to test collision...
       // TODO: Try instead if not moving and not hitting ground/other pieces (stuck in wall) then undo rotation
       // let testpiece = currentPiece.clone();
@@ -692,15 +697,17 @@ function onDocumentKeyDown(event) {
       //     // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
       // });
       // rotatePiece('left');
+    } else {
+      leftDown = false;
     };
-    leftDown = true;
     //console.log('q down');
-  }
-  else if (keyCode == 69) {
-    // if (!hittingWall) {
-    //   // rotatePiece('right');
-    // };
-    rightDown = true;
+  } else if (keyCode == 69) {
+    if (!hittingWall) {
+      rightDown = true;
+      // rotatePiece('right');
+    } else {
+      rightDown = false;
+    };
     //console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
@@ -782,76 +789,74 @@ window.addEventListener('DOMContentLoaded', () => {
       for (const res of event.results[event.results.length - 1]) {
         console.log(res)
         // Try to filter rapid voice results
-        //if (res.isFinal) {
-          speechSynthesis.pause();
-          //console.log(res);
-          let matchedWord = res.transcript.trim().split(' ');
-          if (matchedWord.length != 0) {
-            matchedWord = matchedWord.sort();
-            // Find most used word
-            let counts = {};
-            let countsArr = [];
-            for (let i = 0; i < matchedWord.length; i++) {
-              counts[matchedWord[i]] = 1 + (counts[matchedWord[i]] || 0);
-            }
-            for (let command in counts) {
-              countsArr.push([command, counts[command]]);
+        speechSynthesis.pause();
+        //console.log(res);
+        let matchedWord = res.transcript.trim().split(' ');
+        if (matchedWord.length != 0) {
+          matchedWord = matchedWord.sort();
+          // Find most used word
+          let counts = {};
+          let countsArr = [];
+          for (let i = 0; i < matchedWord.length; i++) {
+            counts[matchedWord[i]] = 1 + (counts[matchedWord[i]] || 0);
           }
-          let newBig = 0;
-          countsArr.sort(function(a, b) {
-              return a[1] - b[1];
-          });          
-            // console.log(countsArr);
-            for (let arr in countsArr) {
-              if (countsArr[arr][1] > newBig) {
-                newBig = arr;
-              }
+          for (let command in counts) {
+            countsArr.push([command, counts[command]]);
+        }
+        let newBig = 0;
+        countsArr.sort(function(a, b) {
+            return a[1] - b[1];
+        });          
+          // console.log(countsArr);
+          for (let arr in countsArr) {
+            if (countsArr[arr][1] > newBig) {
+              newBig = arr;
             }
-            console.log('the final word is ' + countsArr[newBig][0])
-            // Set most used word to matchedWord
-            matchedWord = countsArr[newBig][0];
           }
+          console.log('the final word is ' + countsArr[newBig][0])
+          // Set most used word to matchedWord
+          matchedWord = countsArr[newBig][0];
+        }
 
-          // console.log(matchedWord);
-          if (matchedWord == voiceCommands[0]) {
-            console.log("matched " + voiceCommands[0]);
-            if (rightDown) {
-              rotatePiece('right');
-            } else if (leftDown) {
-              rotatePiece('left');
-            } else {
-              console.log('no rotate direction specified');
-            }
-          } else if (matchedWord == voiceCommands[1]) {
-            console.log("matched " + voiceCommands[1])
-            if (rightDown) {
-              movePiece('right');
-            } else if (leftDown) {
-              movePiece('left');
-            } else if (northDown) {
-              movePiece('north');
-            } else if (southDown) {
-              movePiece('south');
-            } else {
-              console.log('no move direction specified');
-            }
-          } else if (matchedWord == voiceCommands[2]) {
-            console.log("matched " + voiceCommands[2])
-            // TODO: Ensure pieces drop at same place as they land 'naturally'
-            currentPiece.position.set(currentPiece.position.x, 0.6, currentPiece.position.z);
-          } else if (matchedWord == voiceCommands[3]) {
-            console.log("matched " + voiceCommands[3]);
-          } else if (matchedWord == voiceCommands[4]) {
-            spawnPiece();
-            console.log("matched " + voiceCommands[4]);
+        // console.log(matchedWord);
+        if (matchedWord == voiceCommands[0]) {
+          console.log("matched " + voiceCommands[0]);
+          if (rightDown) {
+            rotatePiece('right');
+          } else if (leftDown) {
+            rotatePiece('left');
           } else {
-            console.log('No voice commands recognized');
-          };
-        //}
+            console.log('no rotate direction specified');
+          }
+        } else if (matchedWord == voiceCommands[1]) {
+          console.log("matched " + voiceCommands[1])
+          if (rightDown) {
+            movePiece('right');
+          } else if (leftDown) {
+            movePiece('left');
+          } else if (northDown) {
+            movePiece('north');
+          } else if (southDown) {
+            movePiece('south');
+          } else {
+            console.log('no move direction specified');
+          }
+        } else if (matchedWord == voiceCommands[2]) {
+          console.log("matched " + voiceCommands[2])
+          // TODO: Ensure pieces drop at same place as they land 'naturally'
+          currentPiece.position.set(currentPiece.position.x, 0.6, currentPiece.position.z);
+        } else if (matchedWord == voiceCommands[3]) {
+          console.log("matched " + voiceCommands[3]);
+        } else if (matchedWord == voiceCommands[4]) {
+          spawnPiece();
+          console.log("matched " + voiceCommands[4]);
+        } else {
+          console.log('No voice commands recognized');
+        };
       }
     };
     recognition.continuous = true;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     recognition.addEventListener("result", onResult);
     button.addEventListener("click", event => {
       listening ? stop() : start();
