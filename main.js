@@ -466,6 +466,9 @@ function init() {
   // Setup controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enabled = true;
+  controls.enablePan = false;
+  controls.maxPolarAngle = Math.PI / 2.2;
+  controls.update();
 
   // Spawn arena geometry
   setupGround();
