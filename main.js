@@ -12,6 +12,7 @@ let renderer;
 
 const spawnCord = new THREE.Vector3(-2, 40, 1);
 const gridSize = 4;
+const sceneFPS = 60;
 const defaultCubeSpeed = 2.5;
 let cubeSpeed = defaultCubeSpeed;
 
@@ -559,30 +560,30 @@ function animate() {
 
     // Detect piece collisions
     if (box.intersectsBox(floorBox)) {
-      console.log('hit ground')
+      //console.log('hit ground')
       spawnPiece();
     }
     if (box.intersectsBox(leftWallBox)) {
       leftWallHit = true;
-      console.log('hit left wall');
+      //console.log('hit left wall');
     } else {
       leftWallHit = false;
     }
     if (box.intersectsBox(rightWallBox)) {
       rightWallHit = true;
-      console.log('hit right wall');
+      //console.log('hit right wall');
     } else {
       rightWallHit = false;
     }
     if (box.intersectsBox(southWallBox)) {
       southWallHit = true;
-      console.log('hit south wall');
+      //console.log('hit south wall');
     } else {
       southWallHit = false;
     }
     if (box.intersectsBox(northWallBox)) {
       northWallHit = true;
-      console.log('hit north wall');
+      //console.log('hit north wall');
     } else {
       northWallHit = false;
     }
@@ -640,7 +641,7 @@ function onDocumentKeyDown(event) {
     };
     document.getElementById('voiceComs').style.backgroundColor = '#ebe834';
     rightDown = true;
-    console.log('d down');
+    //console.log('d down');
   } else if (keyCode == 65) {
     if (leftWallHit) {
       console.log('hitting left wall, not moving');
@@ -649,31 +650,32 @@ function onDocumentKeyDown(event) {
     };
     document.getElementById('keyBinds').style.backgroundColor = '#ebe834';
     leftDown = true;
-    console.log('a down');
+    //console.log('a down');
   } else if (keyCode == 87) {
-    if (northWallHit) {
-      console.log('hitting north wall, not moving');
-    } else {
-      movePiece('north');
-    };
+    // if (northWallHit) {
+    //   //console.log('hitting north wall, not moving');
+    // } else {
+    //   //movePiece('north');
+    // };
     northDown = true;
-    console.log('w down');
+    //console.log('w down');
   } else if (keyCode == 83) {
-    if (southWallHit) {
-      console.log('hitting south wall, not moving');
-    } else {
-      movePiece('south');
-    };
+    // if (southWallHit) {
+    //   //console.log('hitting south wall, not moving');
+    // } else {
+    //   //movePiece('south');
+    // };
     southDown = true;
-    console.log('s down');
+    //console.log('s down');
   } else if (keyCode == 82) {
     currentPiece.position.set(-2, 40, 1);
-    console.log('r down');
+    //console.log('r down');
   }
   // Rotation
   else if (keyCode == 81) {
     if (!hittingWall) {
       // Attempt at cloning piece to test collision...
+      // TODO: Try instead if not moving and not hitting ground/other pieces (stuck in wall) then undo rotation
       // let testpiece = currentPiece.clone();
       // testpiece.rotation.y = Math.PI / -2;
       // testpiece.transparent = true;
@@ -692,14 +694,14 @@ function onDocumentKeyDown(event) {
       // rotatePiece('left');
     };
     leftDown = true;
-    console.log('q down');
+    //console.log('q down');
   }
   else if (keyCode == 69) {
-    if (!hittingWall) {
-      // rotatePiece('right');
-    };
+    // if (!hittingWall) {
+    //   // rotatePiece('right');
+    // };
     rightDown = true;
-    console.log('e down');
+    //console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
   };
@@ -710,24 +712,24 @@ function onDocumentKeyUp(event) {
   const keyCode = event.which;
   if (keyCode == 32) {
     cubeSpeed = defaultCubeSpeed;
-    console.log('space up');
+    //console.log('space up');
   }
   else if (keyCode == 68) {
     document.getElementById('voiceComs').style.backgroundColor = 'transparent';
-    console.log('d up');
+    //console.log('d up');
     rightDown = false;
   }
   else if (keyCode == 65) {
     document.getElementById('keyBinds').style.backgroundColor = 'transparent';
-    console.log('a up');
+    //console.log('a up');
     leftDown = false;
   }
   else if (keyCode == 87) {
-    console.log('w up');
+    //console.log('w up');
     northDown = false;
   }
   else if (keyCode == 83) {
-    console.log('s up');
+    //console.log('s up');
     southDown = false;
   }
 };
@@ -771,16 +773,19 @@ window.addEventListener('DOMContentLoaded', () => {
       button.hidden = true;
       music.play();
       init();
-      startAnimating(60);
+      startAnimating(sceneFPS);
     };
 
     const onResult = (event) => {
-      for (const res of event.results) {
+      //console.log(event)
+      console.log(event.results[event.results.length - 1])
+      for (const res of event.results[event.results.length - 1]) {
+        console.log(res)
         // Try to filter rapid voice results
-        if (res.isFinal) {
+        //if (res.isFinal) {
           speechSynthesis.pause();
-          // console.log(res);
-          let matchedWord = res[0].transcript.trim().split(' ');
+          //console.log(res);
+          let matchedWord = res.transcript.trim().split(' ');
           if (matchedWord.length != 0) {
             matchedWord = matchedWord.sort();
             // Find most used word
@@ -842,13 +847,11 @@ window.addEventListener('DOMContentLoaded', () => {
           } else {
             console.log('No voice commands recognized');
           };
-          speechSynthesis.cancel();
-          speechSynthesis.resume();
-        }
+        //}
       }
     };
     recognition.continuous = true;
-    recognition.interimResults = true;
+    recognition.interimResults = false;
     recognition.addEventListener("result", onResult);
     button.addEventListener("click", event => {
       listening ? stop() : start();
