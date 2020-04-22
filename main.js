@@ -59,6 +59,7 @@ let southDown = false;
 // Cannon Vars
 let timeStep = 1/60;
 let world = new CANNON.World();
+let cannonDebugRenderer;
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -101,6 +102,19 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-12));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
   function spawnOPiece() {
@@ -153,6 +167,23 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,0));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,4,0));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,4,0));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,4,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,4,-4));
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
   function spawnTPiece() {
@@ -182,6 +213,19 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
   function spawnSPiece() {
@@ -211,6 +255,19 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,0));
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
   function spawnZPiece() {
@@ -240,6 +297,19 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,0));
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
   function spawnJPiece() {
@@ -270,6 +340,19 @@ function spawnPiece() {
     currentPiece.collisions = 0;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,-8));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
   function spawnLPiece() {
@@ -301,29 +384,27 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(gridSize, gridSize, gridSize));
-    let mass = 1;
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
+    currentPieceBody.angularDamping = 1; // Stops rotating movement
+    currentPieceBody.linearDamping = 0.99;
     currentPieceBody.addShape(cubeShape);
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
+    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,0));
     currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
-
-    world.addBody(currentPieceBody);
-  //   currentPieceBody.addEventListener("collide",function(e){
-  //     console.log("Collided with body:",e.body);
-  //     console.log("Contact between bodies:",e.contact);
-  // });
   }
 
   // Spawn pieces randomly
   const pieces = [
-    // spawnIPiece,
-    // spawnOPiece,
-    // spawnTPiece,
-    // spawnSPiece,
-    // spawnZPiece,
-    // spawnJPiece,
+    spawnIPiece,
+    spawnOPiece,
+    spawnTPiece,
+    spawnSPiece,
+    spawnZPiece,
+    spawnJPiece,
     spawnLPiece,
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
@@ -333,6 +414,12 @@ function spawnPiece() {
   currentPiece.updateWorldMatrix(true, true);
   currPosX = spawnCord.x;
   currPosZ = spawnCord.z;
+
+  world.addBody(currentPieceBody);
+  currentPieceBody.addEventListener("collide",function(e){
+    console.log("Collided with body:",e.body);
+    console.log("Contact between bodies:",e.contact);
+  });
 }
 
 // Spawn arena floor
@@ -347,7 +434,7 @@ function setupGround() {
   floorCube.name = "ground"
 
   // Cannon
-  const cubeShape = new CANNON.Box(new CANNON.Vec3(50, 0.1, 50));
+  const cubeShape = new CANNON.Box(new CANNON.Vec3(25, 0.05, 25));
   floorBody = new CANNON.Body({
     mass: 0
   });
@@ -430,7 +517,7 @@ function setupWalls() {
   leftWallCube.name = "leftWall"
   leftWallCube.geometry.computeBoundingBox();
     // Cannon
-    const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.1, 50, 40));
+    const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.05, 25, 20));
     leftWallBody = new CANNON.Body({
       mass: 0
     });
@@ -467,7 +554,7 @@ function setupWalls() {
   southWallCube.name = "southWall"
   southWallCube.geometry.computeBoundingBox();
       // Cannon
-      const poleWallShape = new CANNON.Box(new CANNON.Vec3(40, 50, 0.1));
+      const poleWallShape = new CANNON.Box(new CANNON.Vec3(20, 25, 0.05));
       southWallBody = new CANNON.Body({
         mass: 0
       });
@@ -501,6 +588,7 @@ function setupWalls() {
 function init() {
   // Initialize scene
   scene = new THREE.Scene();
+  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
   scene.background = new THREE.Color( 0xcce0ff );
 
   // Lights
@@ -556,7 +644,7 @@ function init() {
 
 // Cannon
 function initCannon() {
-  world.gravity.set(0,-1,0);
+  world.gravity.set(0,-25,0);
   world.broadphase = new CANNON.NaiveBroadphase();
   world.solver.iterations = 10;
 }
@@ -589,92 +677,6 @@ function startAnimating(fps) {
   animate();
 }
 
-// Controls falling speed of currentPiece
-// function falling() {
-//   currentPiece.rotation.y = currRotY;
-//   currentPiece.rotation.z = 0;
-//   currentPiece.rotation.x = 0;
-
-//   currentPiece.position.z = currPosZ;
-//   currentPiece.position.x = currPosX;
-// }
-
-// Controls collisions of currentPiece
-// function collisionBoxes() {
-//   // Tetromino
-//   let boxHelper = new THREE.BoxHelper(currentPiece, 0xff0000);
-//   boxHelper.update();
-//   box = new THREE.Box3();
-//   currentPiece.geometry.computeBoundingBox();
-//   box.setFromObject(boxHelper)
-//   boxHelper.visible = true;
-//   // If you want a visible bounding box
-//   // scene.add(boxHelper);
-//   // console.log(helper) // Logs coordinates
-
-//   // Ground
-//   let floorBoxHelper = new THREE.BoxHelper(floorCube, 0xff0000);
-//   floorBoxHelper.update();
-//   floorBox = new THREE.Box3();
-//   floorCube.geometry.computeBoundingBox();
-//   floorBox.setFromObject(floorBoxHelper);
-
-//   // Walls
-//   let leftWallBoxHelper = new THREE.BoxHelper(leftWallCube, 0xff0000);
-//   leftWallBoxHelper.update();
-//   leftWallBox = new THREE.Box3();
-//   leftWallCube.geometry.computeBoundingBox();
-//   leftWallBox.setFromObject(leftWallBoxHelper);
-
-//   let rightWallBoxHelper = new THREE.BoxHelper(rightWallCube, 0xff0000);
-//   rightWallBoxHelper.update();
-//   rightWallBox = new THREE.Box3();
-//   rightWallCube.geometry.computeBoundingBox();
-//   rightWallBox.setFromObject(rightWallBoxHelper);
-
-//   let northWallBoxHelper = new THREE.BoxHelper(northWallCube, 0xff0000);
-//   northWallBoxHelper.update();
-//   northWallBox = new THREE.Box3();
-//   northWallCube.geometry.computeBoundingBox();
-//   northWallBox.setFromObject(northWallBoxHelper);
-
-//   let southWallBoxHelper = new THREE.BoxHelper(southWallCube, 0xff0000);
-//   southWallBoxHelper.update();
-//   southWallBox = new THREE.Box3();
-//   southWallCube.geometry.computeBoundingBox();
-//   southWallBox.setFromObject(southWallBoxHelper); 
-
-//   // Detect piece collisions
-//   if (box.intersectsBox(floorBox)) {
-//     //console.log('hit ground')
-//     //spawnPiece();
-//   }
-//   if (box.intersectsBox(leftWallBox)) {
-//     leftWallHit = true;
-//     //console.log('hit left wall');
-//   } else {
-//     leftWallHit = false;
-//   }
-//   if (box.intersectsBox(rightWallBox)) {
-//     rightWallHit = true;
-//     //console.log('hit right wall');
-//   } else {
-//     rightWallHit = false;
-//   }
-//   if (box.intersectsBox(southWallBox)) {
-//     southWallHit = true;
-//     //console.log('hit south wall');
-//   } else {
-//     southWallHit = false;
-//   }
-//   if (box.intersectsBox(northWallBox)) {
-//     northWallHit = true;
-//     //console.log('hit north wall');
-//   } else {
-//     northWallHit = false;
-//   }
-// }
-
 // Animate scene
 function animate() {
   requestAnimationFrame(animate);
@@ -693,6 +695,7 @@ function animate() {
     // collisionBoxes();
 
     // Render
+    cannonDebugRenderer.update();
     renderer.render(scene, camera);
   }
 }
