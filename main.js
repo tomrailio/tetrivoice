@@ -25,6 +25,7 @@ let box;
 let currentPiece;
 let currentPieceBody;
 
+let angle = 0;
 let currRotY = 0;
 let currPosX = spawnCord.x;
 let currPosZ = spawnCord.z;
@@ -644,7 +645,7 @@ function init() {
 
 // Cannon
 function initCannon() {
-  world.gravity.set(0,-25,0);
+  world.gravity.set(0,-10,0);
   world.broadphase = new CANNON.NaiveBroadphase();
   world.solver.iterations = 10;
 }
@@ -733,8 +734,11 @@ function rotatePiece(dir) {
     num = 2
   };
   //currRotY += Math.PI / num;
-  currentPieceBody.rotation.y += Math.PI / num;
-  currentPiece.rotation.y += Math.PI / num;
+  var axis = new CANNON.Vec3(0,1,0);
+  angle += Math.PI / num;
+  currentPieceBody.quaternion.setFromAxisAngle(axis, angle);
+  // currentPieceBody.rotation.y += Math.PI / num;
+  // currentPiece.rotation.y += Math.PI / num;
 }
 
 // Listen for keyboard input
