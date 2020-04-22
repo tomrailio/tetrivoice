@@ -23,6 +23,8 @@ const voiceCommands = [
 
 let box;
 let currentPiece;
+let currentPieceBody;
+
 let currRotY = 0;
 let currPosX = spawnCord.x;
 let currPosZ = spawnCord.z;
@@ -32,6 +34,11 @@ let rightWallCube;
 let northWallCube;
 let southWallCube;
 
+let floorBody;
+let leftWallBody;
+let rightWallBody;
+let southWallBody;
+let northWallBody;
 let floorBox = new THREE.Box3();
 let leftWallBox = new THREE.Box3();
 let rightWallBox = new THREE.Box3();
@@ -48,6 +55,10 @@ let leftDown = false;
 let rightDown = false;
 let northDown = false;
 let southDown = false;
+
+// Cannon Vars
+let timeStep = 1/60;
+let world = new CANNON.World();
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -288,16 +299,31 @@ function spawnPiece() {
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
     scene.add(currentPiece);
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(gridSize, gridSize, gridSize));
+    let mass = 1;
+    currentPieceBody = new CANNON.Body({
+      mass: 1
+    });
+    currentPieceBody.addShape(cubeShape);
+    currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
+
+    world.addBody(currentPieceBody);
+  //   currentPieceBody.addEventListener("collide",function(e){
+  //     console.log("Collided with body:",e.body);
+  //     console.log("Contact between bodies:",e.contact);
+  // });
   }
 
   // Spawn pieces randomly
   const pieces = [
-    spawnIPiece,
-    spawnOPiece,
-    spawnTPiece,
-    spawnSPiece,
-    spawnZPiece,
-    spawnJPiece,
+    // spawnIPiece,
+    // spawnOPiece,
+    // spawnTPiece,
+    // spawnSPiece,
+    // spawnZPiece,
+    // spawnJPiece,
     spawnLPiece,
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
@@ -319,6 +345,16 @@ function setupGround() {
   floorCube.position.y = -1;
   scene.add(floorCube);
   floorCube.name = "ground"
+
+  // Cannon
+  const cubeShape = new CANNON.Box(new CANNON.Vec3(50, 0.1, 50));
+  floorBody = new CANNON.Body({
+    mass: 0
+  });
+  floorBody.addShape(cubeShape);
+  floorBody.position.y = -1;
+
+  world.addBody(floorBody);
 
   // Draw floor grid
   const lineMaterial = new THREE.MeshPhongMaterial({
@@ -393,6 +429,17 @@ function setupWalls() {
   scene.add(leftWallCube);
   leftWallCube.name = "leftWall"
   leftWallCube.geometry.computeBoundingBox();
+    // Cannon
+    const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.1, 50, 40));
+    leftWallBody = new CANNON.Body({
+      mass: 0
+    });
+    leftWallBody.addShape(sideWallShape);
+    leftWallBody.position.x = -20;
+    leftWallBody.position.y = 23;
+    leftWallBody.position.z = -1;
+  
+    world.addBody(leftWallBody);
   // Right
   rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
   rightWallCube.position.x = 20;
@@ -401,6 +448,16 @@ function setupWalls() {
   scene.add(rightWallCube);
   rightWallCube.name = "rightWall"
   rightWallCube.geometry.computeBoundingBox();
+      // Cannon
+      rightWallBody = new CANNON.Body({
+        mass: 0
+      });
+      rightWallBody.addShape(sideWallShape);
+      rightWallBody.position.x = 20;
+      rightWallBody.position.y = 23;
+      rightWallBody.position.z = -1;
+
+      world.addBody(rightWallBody);
   // south
   southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
@@ -409,6 +466,17 @@ function setupWalls() {
   scene.add(southWallCube);
   southWallCube.name = "southWall"
   southWallCube.geometry.computeBoundingBox();
+      // Cannon
+      const poleWallShape = new CANNON.Box(new CANNON.Vec3(40, 50, 0.1));
+      southWallBody = new CANNON.Body({
+        mass: 0
+      });
+      southWallBody.addShape(poleWallShape);
+      southWallBody.position.x = 0;
+      southWallBody.position.y = 23;
+      southWallBody.position.z = 19;
+    
+      world.addBody(southWallBody);
   // north
   northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
@@ -417,6 +485,16 @@ function setupWalls() {
   scene.add(northWallCube);
   northWallCube.name = "northWall"
   northWallCube.geometry.computeBoundingBox();
+        // Cannon
+        northWallBody = new CANNON.Body({
+          mass: 0
+        });
+        northWallBody.addShape(poleWallShape);
+        northWallBody.position.x = 0;
+        northWallBody.position.y = 23;
+        northWallBody.position.z = -21;
+      
+        world.addBody(northWallBody);
 }
 
 // Singular function to initialize scene + rendering
@@ -473,6 +551,27 @@ function init() {
   setupWalls();
   // Spawn initial piece
   spawnPiece();
+  initCannon();
+}
+
+// Cannon
+function initCannon() {
+  world.gravity.set(0,-1,0);
+  world.broadphase = new CANNON.NaiveBroadphase();
+  world.solver.iterations = 10;
+}
+
+function updatePhysics() {
+  // Step the physics world
+  world.step(timeStep);
+
+  // Copy coordinates from Cannon.js to Three.js
+  // mesh.position.copy(body.position);
+  // mesh.quaternion.copy(body.quaternion);
+  if (currentPiece) {
+    currentPiece.position.copy(currentPieceBody.position);
+    currentPiece.quaternion.copy(currentPieceBody.quaternion);
+  }
 }
 
 // Control animation FPS
@@ -491,90 +590,90 @@ function startAnimating(fps) {
 }
 
 // Controls falling speed of currentPiece
-function falling() {
-  currentPiece.rotation.y = currRotY;
-  currentPiece.rotation.z = 0;
-  currentPiece.rotation.x = 0;
+// function falling() {
+//   currentPiece.rotation.y = currRotY;
+//   currentPiece.rotation.z = 0;
+//   currentPiece.rotation.x = 0;
 
-  currentPiece.position.z = currPosZ;
-  currentPiece.position.x = currPosX;
-}
+//   currentPiece.position.z = currPosZ;
+//   currentPiece.position.x = currPosX;
+// }
 
 // Controls collisions of currentPiece
-function collisionBoxes() {
-  // Tetromino
-  let boxHelper = new THREE.BoxHelper(currentPiece, 0xff0000);
-  boxHelper.update();
-  box = new THREE.Box3();
-  currentPiece.geometry.computeBoundingBox();
-  box.setFromObject(boxHelper)
-  boxHelper.visible = true;
-  // If you want a visible bounding box
-  // scene.add(boxHelper);
-  // console.log(helper) // Logs coordinates
+// function collisionBoxes() {
+//   // Tetromino
+//   let boxHelper = new THREE.BoxHelper(currentPiece, 0xff0000);
+//   boxHelper.update();
+//   box = new THREE.Box3();
+//   currentPiece.geometry.computeBoundingBox();
+//   box.setFromObject(boxHelper)
+//   boxHelper.visible = true;
+//   // If you want a visible bounding box
+//   // scene.add(boxHelper);
+//   // console.log(helper) // Logs coordinates
 
-  // Ground
-  let floorBoxHelper = new THREE.BoxHelper(floorCube, 0xff0000);
-  floorBoxHelper.update();
-  floorBox = new THREE.Box3();
-  floorCube.geometry.computeBoundingBox();
-  floorBox.setFromObject(floorBoxHelper);
+//   // Ground
+//   let floorBoxHelper = new THREE.BoxHelper(floorCube, 0xff0000);
+//   floorBoxHelper.update();
+//   floorBox = new THREE.Box3();
+//   floorCube.geometry.computeBoundingBox();
+//   floorBox.setFromObject(floorBoxHelper);
 
-  // Walls
-  let leftWallBoxHelper = new THREE.BoxHelper(leftWallCube, 0xff0000);
-  leftWallBoxHelper.update();
-  leftWallBox = new THREE.Box3();
-  leftWallCube.geometry.computeBoundingBox();
-  leftWallBox.setFromObject(leftWallBoxHelper);
+//   // Walls
+//   let leftWallBoxHelper = new THREE.BoxHelper(leftWallCube, 0xff0000);
+//   leftWallBoxHelper.update();
+//   leftWallBox = new THREE.Box3();
+//   leftWallCube.geometry.computeBoundingBox();
+//   leftWallBox.setFromObject(leftWallBoxHelper);
 
-  let rightWallBoxHelper = new THREE.BoxHelper(rightWallCube, 0xff0000);
-  rightWallBoxHelper.update();
-  rightWallBox = new THREE.Box3();
-  rightWallCube.geometry.computeBoundingBox();
-  rightWallBox.setFromObject(rightWallBoxHelper);
+//   let rightWallBoxHelper = new THREE.BoxHelper(rightWallCube, 0xff0000);
+//   rightWallBoxHelper.update();
+//   rightWallBox = new THREE.Box3();
+//   rightWallCube.geometry.computeBoundingBox();
+//   rightWallBox.setFromObject(rightWallBoxHelper);
 
-  let northWallBoxHelper = new THREE.BoxHelper(northWallCube, 0xff0000);
-  northWallBoxHelper.update();
-  northWallBox = new THREE.Box3();
-  northWallCube.geometry.computeBoundingBox();
-  northWallBox.setFromObject(northWallBoxHelper);
+//   let northWallBoxHelper = new THREE.BoxHelper(northWallCube, 0xff0000);
+//   northWallBoxHelper.update();
+//   northWallBox = new THREE.Box3();
+//   northWallCube.geometry.computeBoundingBox();
+//   northWallBox.setFromObject(northWallBoxHelper);
 
-  let southWallBoxHelper = new THREE.BoxHelper(southWallCube, 0xff0000);
-  southWallBoxHelper.update();
-  southWallBox = new THREE.Box3();
-  southWallCube.geometry.computeBoundingBox();
-  southWallBox.setFromObject(southWallBoxHelper); 
+//   let southWallBoxHelper = new THREE.BoxHelper(southWallCube, 0xff0000);
+//   southWallBoxHelper.update();
+//   southWallBox = new THREE.Box3();
+//   southWallCube.geometry.computeBoundingBox();
+//   southWallBox.setFromObject(southWallBoxHelper); 
 
-  // Detect piece collisions
-  if (box.intersectsBox(floorBox)) {
-    //console.log('hit ground')
-    spawnPiece();
-  }
-  if (box.intersectsBox(leftWallBox)) {
-    leftWallHit = true;
-    //console.log('hit left wall');
-  } else {
-    leftWallHit = false;
-  }
-  if (box.intersectsBox(rightWallBox)) {
-    rightWallHit = true;
-    //console.log('hit right wall');
-  } else {
-    rightWallHit = false;
-  }
-  if (box.intersectsBox(southWallBox)) {
-    southWallHit = true;
-    //console.log('hit south wall');
-  } else {
-    southWallHit = false;
-  }
-  if (box.intersectsBox(northWallBox)) {
-    northWallHit = true;
-    //console.log('hit north wall');
-  } else {
-    northWallHit = false;
-  }
-}
+//   // Detect piece collisions
+//   if (box.intersectsBox(floorBox)) {
+//     //console.log('hit ground')
+//     //spawnPiece();
+//   }
+//   if (box.intersectsBox(leftWallBox)) {
+//     leftWallHit = true;
+//     //console.log('hit left wall');
+//   } else {
+//     leftWallHit = false;
+//   }
+//   if (box.intersectsBox(rightWallBox)) {
+//     rightWallHit = true;
+//     //console.log('hit right wall');
+//   } else {
+//     rightWallHit = false;
+//   }
+//   if (box.intersectsBox(southWallBox)) {
+//     southWallHit = true;
+//     //console.log('hit south wall');
+//   } else {
+//     southWallHit = false;
+//   }
+//   if (box.intersectsBox(northWallBox)) {
+//     northWallHit = true;
+//     //console.log('hit north wall');
+//   } else {
+//     northWallHit = false;
+//   }
+// }
 
 // Animate scene
 function animate() {
@@ -582,13 +681,16 @@ function animate() {
   now = Date.now();
   elapsed = now - then;
 
+  // Cannon
+  updatePhysics();
+
   if (elapsed > fpsInterval) {
     // Get ready for next frame by setting then=now, but...
     // Also, adjust for fpsInterval not being multiple of 16.67
     then = now - (elapsed % fpsInterval);
 
-    falling();
-    collisionBoxes();
+    // falling();
+    // collisionBoxes();
 
     // Render
     renderer.render(scene, camera);
@@ -612,9 +714,13 @@ function movePiece(dir) {
     num = -1
   };
   if (dir == 'left' || dir == 'right') {
-    currPosX += (4 * num);
+    //currPosX += (4 * num);
+    currentPieceBody.position.x += (4 * num);
+    currentPiece.position.x += (4 * num);
   } else {
-    currPosZ += (4 * num);
+    //currPosZ += (4 * num);
+    currentPieceBody.position.z += (4 * num);
+    currentPiece.position.z += (4 * num);
   }
 };
 
@@ -623,7 +729,9 @@ function rotatePiece(dir) {
   if (dir == 'left') {
     num = 2
   };
-  currRotY += Math.PI / num;
+  //currRotY += Math.PI / num;
+  currentPieceBody.rotation.y += Math.PI / num;
+  currentPiece.rotation.y += Math.PI / num;
 }
 
 // Listen for keyboard input
@@ -635,43 +743,47 @@ function onDocumentKeyDown(event) {
     cubeSpeed = 20;
     console.log('space down');
   } else if (keyCode == 68) {
-    if (rightWallHit) {
-      rightDown = false;
-      console.log('hitting right wall, not moving');
-    } else {
-      //movePiece('right');
-      rightDown = true;
-    };
+    // if (rightWallHit) {
+    //   rightDown = false;
+    //   console.log('hitting right wall, not moving');
+    // } else {
+    //   //movePiece('right');
+    //   rightDown = true;
+    // };
+    movePiece('right');
     document.getElementById('rightArrow').style.backgroundColor = '#ebe834';
     //console.log('d down');
   } else if (keyCode == 65) {
-    if (leftWallHit) {
-      leftDown = false;
-      console.log('hitting left wall, not moving');
-    } else {
-      //movePiece('left');
-      leftDown = true;
-    };
+    // if (leftWallHit) {
+    //   leftDown = false;
+    //   console.log('hitting left wall, not moving');
+    // } else {
+    //   //movePiece('left');
+    //   leftDown = true;
+    // };
+    movePiece('left');
     document.getElementById('leftArrow').style.backgroundColor = '#ebe834';
     //console.log('a down');
   } else if (keyCode == 87) {
-    if (northWallHit) {
-      northDown = false;
-      console.log('hitting north wall, not moving');
-    } else {
-      //movePiece('north');
-      northDown = true;
-    };
+    // if (northWallHit) {
+    //   northDown = false;
+    //   console.log('hitting north wall, not moving');
+    // } else {
+    //   //movePiece('north');
+    //   northDown = true;
+    // };
+    movePiece('north');
     document.getElementById('upArrow').style.backgroundColor = '#ebe834';
     //console.log('w down');
   } else if (keyCode == 83) {
-    if (southWallHit) {
-      southDown = false;
-      console.log('hitting south wall, not moving');
-    } else {
-      //movePiece('south');
-      southDown = true;
-    };
+    // if (southWallHit) {
+    //   southDown = false;
+    //   console.log('hitting south wall, not moving');
+    // } else {
+    //   //movePiece('south');
+    //   southDown = true;
+    // };
+    movePiece('south');
     document.getElementById('downArrow').style.backgroundColor = '#ebe834';
     //console.log('s down');
   } else if (keyCode == 82) {
@@ -680,37 +792,22 @@ function onDocumentKeyDown(event) {
   }
   // Rotation
   else if (keyCode == 81) {
-    if (!hittingWall) {
-      leftDown = true;
-      // Attempt at cloning piece to test collision...
-      // TODO: Try instead if not moving and not hitting ground/other pieces (stuck in wall) then undo rotation
-      // let testpiece = currentPiece.clone();
-      // testpiece.rotation.y = Math.PI / -2;
-      // testpiece.transparent = true;
-      // console.log(testpiece)
-      // scene.add(testpiece)
-      //   testpiece.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-      //     if (other_object.name == 'leftWall') {
-      //       console.log('testpiece hit wall, deleting piece and not rotating');
-      //       scene.remove(testpiece)
-      //     } else {
-      //       scene.remove(testpiece)
-      //       rotatePiece('left');
-      //     }
-      //     // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
-      // });
-      // rotatePiece('left');
-    } else {
-      leftDown = false;
-    };
+    // if (!hittingWall) {
+    //   leftDown = true;
+    //   // rotatePiece('left');
+    // } else {
+    //   leftDown = false;
+    // };
+    rotatePiece('left');
     //console.log('q down');
   } else if (keyCode == 69) {
-    if (!hittingWall) {
-      rightDown = true;
-      // rotatePiece('right');
-    } else {
-      rightDown = false;
-    };
+    // if (!hittingWall) {
+    //   rightDown = true;
+    //   // rotatePiece('right');
+    // } else {
+    //   rightDown = false;
+    // };
+    rotatePiece('right');
     //console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
