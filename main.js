@@ -58,6 +58,7 @@ let leftWallBox = new THREE.Box3();
 let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
+let collisionObjects = [];
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -207,6 +208,7 @@ function setupArena() {
     floorBody.position.y = -1;
 
     world.addBody(floorBody);
+    collisionObjects.push(floorBody)
 
     // Draw floor grid
     const lineMaterial = new THREE.MeshPhongMaterial({
@@ -385,7 +387,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -450,7 +452,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -496,7 +498,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -538,7 +540,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -580,7 +582,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -623,7 +625,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -665,7 +667,7 @@ function spawnPiece() {
     scene.add(currentPiece);
 
     // Cannon
-    const cubeShape = new CANNON.Box(new CANNON.Vec3(2,2,2));
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(1.9,1.9,1.9));
     currentPieceBody = new CANNON.Body({
       mass: 1
     });
@@ -709,10 +711,14 @@ function spawnPiece() {
 //
 function hitWall() {
   if (hittingWall[0] == true) {
-    if (hittingWall[1] == floorBody.id) {
-      console.log('hit ground, spawning new block');
-      spawnPiece();
-    } else if (lastmove[0] == 'rotate') {
+    for (let i = 0; i < collisionObjects.length; i++) {
+      if (hittingWall[1] == collisionObjects[i].id) {
+        console.log('hit ground, spawning new block');
+        collisionObjects.push(currentPieceBody);
+        spawnPiece();
+      }
+    };
+    if (lastmove[0] == 'rotate') {
       if (lastmove[1] == 'left') {
         rotatePiece('right');
       } else if (lastmove[1] == 'right') {
