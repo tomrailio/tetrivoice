@@ -6,12 +6,30 @@
 let scene;
 let camera;
 let renderer;
-
 const spawnCord = new THREE.Vector3(-2, 40, 1);
 const gridSize = 4;
 const sceneFPS = 60;
+
+// Cannon Vars
+let stop = false;
+let frameCount = 0;
+let fps, fpsInterval, startTime, now, then, elapsed;
+let timeStep = 1/60;
+let world = new CANNON.World();
+let cannonDebugRenderer;
+
+// Movement
 const defaultCubeSpeed = 2.5;
 let cubeSpeed = defaultCubeSpeed;
+let angle = 0;
+let lastmove = ['', '']
+let hittingWall = [false, NaN];
+let currPosX = spawnCord.x;
+let currPosZ = spawnCord.z;
+let leftDown = false;
+let rightDown = false;
+let northDown = false;
+let southDown = false;
 
 const voiceCommands = [
   'rotate',
@@ -21,22 +39,15 @@ const voiceCommands = [
   'spawn'
 ];
 
+// Geometry
 let box;
 let currentPiece;
 let currentPieceBody;
-
-let oldPosition;
-
-let angle = 0;
-let currRotY = 0;
-let currPosX = spawnCord.x;
-let currPosZ = spawnCord.z;
 let floorCube;
 let leftWallCube;
 let rightWallCube;
 let northWallCube;
 let southWallCube;
-
 let floorBody;
 let leftWallBody;
 let rightWallBody;
@@ -48,28 +59,296 @@ let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
 
-let lastmove = ['', '']
-let hittingWall = [false, NaN];
-
-let leftDown = false;
-let rightDown = false;
-let northDown = false;
-let southDown = false;
-
-// Cannon Vars
-let timeStep = 1/60;
-let world = new CANNON.World();
-let cannonDebugRenderer;
-
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
 tetrominoes_font.load().then(function(loaded_face) {
-  // loaded_face holds the loaded FontFace
   document.fonts.add(loaded_face);
   document.body.style.fontFamily = '"Tetrominoes Regular", Arial';
 }).catch(function(error) {
   console.log('Couldn\'t load "Tetrominoes" font. https://www.dafont.com/tetrominoes.font');
 });
+
+// Listen for window resize event && ensure scene view resizes with window
+window.addEventListener('resize', function() {
+  // function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+//
+// Setup scene
+//
+function init() {
+  // Initialize scene
+  scene = new THREE.Scene();
+  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world ); // TODO: Add ability to toggle debug renderer
+  scene.background = new THREE.Color( 0xcce0ff );
+
+  // Lights
+  scene.add( new THREE.AmbientLight( 0x666666 ));
+  const light = new THREE.DirectionalLight(0xdfebff, 1);
+  light.position.set(0, 50, 0);
+  light.position.multiplyScalar(1.3);
+  light.castShadow = true;
+  light.shadow.mapSize.width = 1024;
+  light.shadow.mapSize.height = 1024;
+  const distance = 300;
+  light.shadow.camera.left = - distance;
+  light.shadow.camera.right = distance;
+  light.shadow.camera.top = distance;
+  light.shadow.camera.bottom = -distance;
+  light.shadow.camera.far = 1000;
+  scene.add(light);
+
+  // Setup perspective camera
+  camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+  );
+  camera.position.z = 50;
+  camera.position.y = 100;
+  camera.position.x = 0;
+  camera.translateY(10);
+
+  // Setup renderer
+  renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+  renderer.shadowMap.enabled = true; // Enable shadows
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Setup controls
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enabled = true;
+  controls.enablePan = false;
+  controls.enableZoom = false;
+  controls.maxPolarAngle = Math.PI / 2.2;
+  controls.update();
+
+  // Spawn arena geometry
+  setupArena();
+  // Spawn initial piece
+  spawnPiece();
+  // Initialize physics
+  // Cannon
+  function initCannon() {
+    world.gravity.set(0,-20,0);
+    world.broadphase = new CANNON.NaiveBroadphase();
+    world.solver.iterations = 1;
+  }
+  initCannon();
+  startAnimating(sceneFPS);
+}
+
+// Control animation FPS
+// https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe/19772220#19772220
+// Initialize the timer variables and start the animation
+function startAnimating(fps) {
+  fpsInterval = 1000 / fps;
+  then = Date.now();
+  startTime = then;
+  // console.log('start time: ' + startTime);
+
+  // Animate scene
+  function animate() {
+    requestAnimationFrame(animate);
+    now = Date.now();
+    elapsed = now - then;
+
+    // Cannon
+    function updatePhysics() {
+      // Step the physics world
+      world.step(timeStep);
+    
+      // Copy coordinates from Cannon.js to Three.js
+      currentPiece.position.copy(currentPieceBody.position);
+      currentPiece.quaternion.copy(currentPieceBody.quaternion);
+    }
+    updatePhysics();
+
+    if (elapsed > fpsInterval) {
+      // Get ready for next frame by setting then=now, but...
+      // Also, adjust for fpsInterval not being multiple of 16.67
+      then = now - (elapsed % fpsInterval);
+
+      hitWall();
+
+      // Render
+      cannonDebugRenderer.update();
+      renderer.render(scene, camera);
+    }
+  }
+  animate();
+}
+
+// Geometry
+function setupArena() {
+  // Spawn arena floor
+  function setupGround() {
+    // Setup placeholder floor
+    const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
+    const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
+    floorCube = new THREE.Mesh(floorGeometry, floorMaterial, 0);
+    floorCube.receiveShadow = true;
+    floorCube.position.y = -1;
+    scene.add(floorCube);
+    floorCube.name = "ground"
+
+    // Cannon
+    const cubeShape = new CANNON.Box(new CANNON.Vec3(25, 0.05, 25));
+    floorBody = new CANNON.Body({
+      mass: 0
+    });
+    floorBody.addShape(cubeShape);
+    floorBody.position.y = -1;
+
+    world.addBody(floorBody);
+
+    // Draw floor grid
+    const lineMaterial = new THREE.MeshPhongMaterial({
+      color: 0x000000,
+      opacity: 1,
+      transparent: true,
+    });
+
+    // Draws a straight line with two sets of given vector coordinates
+    // Ex.: drawLine([,,], [,,]);
+    function drawLine() {
+      const points = [];
+      points.push(new THREE.Vector3(
+        arguments[0][0],
+        arguments[0][1],
+        arguments[0][2],
+      ));
+      points.push(new THREE.Vector3(
+        arguments[1][0],
+        arguments[1][1],
+        arguments[1][2],
+      ));
+      const line = new THREE.BufferGeometry().setFromPoints(points);
+      const newline = new THREE.Line(line, lineMaterial);
+      scene.add(newline);
+    }
+
+    // Draws a specified set of horizontal lines at a given start and unit step.
+    // Ex.: horizontalLines([St,ar,t], Step, Total)
+    function horizontalLines() {
+      let start = arguments[0][2];
+      for (let i = 0; i < arguments[2]; i += 1) {
+        drawLine(
+          [arguments[0][0], arguments[0][1], start],
+          [-arguments[0][0], arguments[0][1], start],
+        );
+        start += arguments[1];
+      }
+    }
+    horizontalLines([-20, 0, -21], gridSize, 11);
+
+    // Draws a specified set of vertical lines at a given start and unit step.
+    // Ex.: verticalLines([St,ar,t], Step, Total)
+    function verticalLines() {
+      let start = arguments[0][0];
+      for (let i = 0; i < arguments[2]; i += 1) {
+        drawLine(
+          [start, arguments[0][1], arguments[0][2]],
+          [start, arguments[0][1], -arguments[0][2]],
+        );
+        start += arguments[1];
+      }
+    }
+    verticalLines([-20, 0, 21], gridSize, 11);
+  };
+
+  // Spawn grid walls
+  function setupWalls() {
+    // Setup placeholder walls
+    const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
+    const poleWallGeometry = new THREE.BoxGeometry(40, 50, 0.1);
+    const wallMaterial = new THREE.MeshLambertMaterial({
+      color: 0x9e0018,
+      opacity: 0.1,
+      transparent: true,
+    });
+    // Left
+    leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
+    leftWallCube.position.x = -20;
+    leftWallCube.position.y = 23;
+    leftWallCube.position.z = -1;
+    scene.add(leftWallCube);
+    leftWallCube.name = "leftWall"
+    leftWallCube.geometry.computeBoundingBox();
+    // Cannon
+    const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.05, 25, 20));
+    leftWallBody = new CANNON.Body({
+      mass: 0
+    });
+    leftWallBody.addShape(sideWallShape);
+    leftWallBody.position.x = -21;
+    leftWallBody.position.y = 23;
+    leftWallBody.position.z = -1;
+    world.addBody(leftWallBody);
+
+    // Right
+    rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
+    rightWallCube.position.x = 20;
+    rightWallCube.position.y = 23;
+    rightWallCube.position.z = -1;
+    scene.add(rightWallCube);
+    rightWallCube.name = "rightWall"
+    rightWallCube.geometry.computeBoundingBox();
+    // Cannon
+    rightWallBody = new CANNON.Body({
+      mass: 0
+    });
+    rightWallBody.addShape(sideWallShape);
+    rightWallBody.position.x = 21;
+    rightWallBody.position.y = 23;
+    rightWallBody.position.z = -1;
+    world.addBody(rightWallBody);
+
+    // south
+    southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
+    southWallCube.position.x = 0;
+    southWallCube.position.y = 23;
+    southWallCube.position.z = 19;
+    scene.add(southWallCube);
+    southWallCube.name = "southWall"
+    southWallCube.geometry.computeBoundingBox();
+    // Cannon
+    const poleWallShape = new CANNON.Box(new CANNON.Vec3(20, 25, 0.05));
+    southWallBody = new CANNON.Body({
+      mass: 0
+    });
+    southWallBody.addShape(poleWallShape);
+    southWallBody.position.x = 0;
+    southWallBody.position.y = 23;
+    southWallBody.position.z = 20;
+    world.addBody(southWallBody);
+
+    // north
+    northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
+    northWallCube.position.x = 0;
+    northWallCube.position.y = 23;
+    northWallCube.position.z = -21;
+    scene.add(northWallCube);
+    northWallCube.name = "northWall"
+    northWallCube.geometry.computeBoundingBox();
+    // Cannon
+    northWallBody = new CANNON.Body({
+      mass: 0
+    });
+    northWallBody.addShape(poleWallShape);
+    northWallBody.position.x = 0;
+    northWallBody.position.y = 23;
+    northWallBody.position.z = -22;
+    world.addBody(northWallBody);
+  };
+
+  setupGround();
+  setupWalls();
+}
 
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
@@ -423,261 +702,10 @@ function spawnPiece() {
   });
 }
 
-// Spawn arena floor
-function setupGround() {
-  // Setup placeholder floor
-  const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
-  const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
-  floorCube = new THREE.Mesh(floorGeometry, floorMaterial, 0);
-  floorCube.receiveShadow = true;
-  floorCube.position.y = -1;
-  scene.add(floorCube);
-  floorCube.name = "ground"
-
-  // Cannon
-  const cubeShape = new CANNON.Box(new CANNON.Vec3(25, 0.05, 25));
-  floorBody = new CANNON.Body({
-    mass: 0
-  });
-  floorBody.addShape(cubeShape);
-  floorBody.position.y = -1;
-
-  world.addBody(floorBody);
-
-  // Draw floor grid
-  const lineMaterial = new THREE.MeshPhongMaterial({
-    color: 0x000000,
-    opacity: 1,
-    transparent: true,
-  });
-
-  // Draws a straight line with two sets of given vector coordinates
-  // Ex.: drawLine([,,], [,,]);
-  function drawLine() {
-    const points = [];
-    points.push(new THREE.Vector3(
-      arguments[0][0],
-      arguments[0][1],
-      arguments[0][2],
-    ));
-    points.push(new THREE.Vector3(
-      arguments[1][0],
-      arguments[1][1],
-      arguments[1][2],
-    ));
-    const line = new THREE.BufferGeometry().setFromPoints(points);
-    const newline = new THREE.Line(line, lineMaterial);
-    scene.add(newline);
-  }
-
-  // Draws a specified set of horizontal lines at a given start and unit step.
-  // Ex.: horizontalLines([St,ar,t], Step, Total)
-  function horizontalLines() {
-    let start = arguments[0][2];
-    for (let i = 0; i < arguments[2]; i += 1) {
-      drawLine(
-        [arguments[0][0], arguments[0][1], start],
-        [-arguments[0][0], arguments[0][1], start],
-      );
-      start += arguments[1];
-    }
-  }
-  horizontalLines([-20, 0, -21], gridSize, 11);
-
-  // Draws a specified set of vertical lines at a given start and unit step.
-  // Ex.: verticalLines([St,ar,t], Step, Total)
-  function verticalLines() {
-    let start = arguments[0][0];
-    for (let i = 0; i < arguments[2]; i += 1) {
-      drawLine(
-        [start, arguments[0][1], arguments[0][2]],
-        [start, arguments[0][1], -arguments[0][2]],
-      );
-      start += arguments[1];
-    }
-  }
-  verticalLines([-20, 0, 21], gridSize, 11);
-}
-
-// Spawn grid walls
-function setupWalls() {
-  // Setup placeholder walls
-  const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
-  const poleWallGeometry = new THREE.BoxGeometry(40, 50, 0.1);
-  const wallMaterial = new THREE.MeshLambertMaterial({
-    color: 0x9e0018,
-    opacity: 0.1,
-    transparent: true,
-  });
-  // Left
-  leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-  leftWallCube.position.x = -20;
-  leftWallCube.position.y = 23;
-  leftWallCube.position.z = -1;
-  scene.add(leftWallCube);
-  leftWallCube.name = "leftWall"
-  leftWallCube.geometry.computeBoundingBox();
-  // Cannon
-  const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.05, 25, 20));
-  leftWallBody = new CANNON.Body({
-    mass: 0
-  });
-  leftWallBody.addShape(sideWallShape);
-  leftWallBody.position.x = -21;
-  leftWallBody.position.y = 23;
-  leftWallBody.position.z = -1;
-  world.addBody(leftWallBody);
-
-  // Right
-  rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-  rightWallCube.position.x = 20;
-  rightWallCube.position.y = 23;
-  rightWallCube.position.z = -1;
-  scene.add(rightWallCube);
-  rightWallCube.name = "rightWall"
-  rightWallCube.geometry.computeBoundingBox();
-  // Cannon
-  rightWallBody = new CANNON.Body({
-    mass: 0
-  });
-  rightWallBody.addShape(sideWallShape);
-  rightWallBody.position.x = 21;
-  rightWallBody.position.y = 23;
-  rightWallBody.position.z = -1;
-  world.addBody(rightWallBody);
-
-  // south
-  southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
-  southWallCube.position.x = 0;
-  southWallCube.position.y = 23;
-  southWallCube.position.z = 19;
-  scene.add(southWallCube);
-  southWallCube.name = "southWall"
-  southWallCube.geometry.computeBoundingBox();
-  // Cannon
-  const poleWallShape = new CANNON.Box(new CANNON.Vec3(20, 25, 0.05));
-  southWallBody = new CANNON.Body({
-    mass: 0
-  });
-  southWallBody.addShape(poleWallShape);
-  southWallBody.position.x = 0;
-  southWallBody.position.y = 23;
-  southWallBody.position.z = 20;
-  world.addBody(southWallBody);
-
-  // north
-  northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
-  northWallCube.position.x = 0;
-  northWallCube.position.y = 23;
-  northWallCube.position.z = -21;
-  scene.add(northWallCube);
-  northWallCube.name = "northWall"
-  northWallCube.geometry.computeBoundingBox();
-  // Cannon
-  northWallBody = new CANNON.Body({
-    mass: 0
-  });
-  northWallBody.addShape(poleWallShape);
-  northWallBody.position.x = 0;
-  northWallBody.position.y = 23;
-  northWallBody.position.z = -22;
-  world.addBody(northWallBody);
-}
-
-// Singular function to initialize scene + rendering
-function init() {
-  // Initialize scene
-  scene = new THREE.Scene();
-  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
-  scene.background = new THREE.Color( 0xcce0ff );
-
-  // Lights
-  scene.add( new THREE.AmbientLight( 0x666666 ));
-  const light = new THREE.DirectionalLight(0xdfebff, 1);
-  light.position.set(0, 50, 0);
-  light.position.multiplyScalar(1.3);
-  light.castShadow = true;
-  light.shadow.mapSize.width = 1024;
-  light.shadow.mapSize.height = 1024;
-  const distance = 300;
-  light.shadow.camera.left = - distance;
-  light.shadow.camera.right = distance;
-  light.shadow.camera.top = distance;
-  light.shadow.camera.bottom = -distance;
-  light.shadow.camera.far = 1000;
-  scene.add(light);
-
-  // Setup perspective camera
-  camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-  );
-  camera.position.z = 50;
-  camera.position.y = 100;
-  camera.position.x = 0;
-
-  camera.translateY(10);
-
-  // Setup renderer
-  renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-  renderer.shadowMap.enabled = true; // Enable shadows
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  // Setup controls
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enabled = true;
-  controls.enablePan = false;
-  controls.enableZoom = false;
-  controls.maxPolarAngle = Math.PI / 2.2;
-  controls.update();
-
-  // Spawn arena geometry
-  setupGround();
-  setupWalls();
-  // Spawn initial piece
-  spawnPiece();
-  initCannon();
-}
-
-// Cannon
-function initCannon() {
-  world.gravity.set(0,-20,0);
-  world.broadphase = new CANNON.NaiveBroadphase();
-  world.solver.iterations = 1;
-}
-
-function updatePhysics() {
-  // Step the physics world
-  world.step(timeStep);
-
-  // Copy coordinates from Cannon.js to Three.js
-  // mesh.position.copy(body.position);
-  // mesh.quaternion.copy(body.quaternion);
-  if (currentPiece) {
-    currentPiece.position.copy(currentPieceBody.position);
-    currentPiece.quaternion.copy(currentPieceBody.quaternion);
-  }
-}
-
-// Control animation FPS
-// https://stackoverflow.com/questions/19764018/controlling-fps-with-requestanimationframe/19772220#19772220
-let stop = false;
-let frameCount = 0;
-let fps, fpsInterval, startTime, now, then, elapsed;
-
-// Initialize the timer variables and start the animation
-function startAnimating(fps) {
-  fpsInterval = 1000 / fps;
-  then = Date.now();
-  startTime = then;
-  // console.log('start time: ' + startTime);
-  animate();
-}
-
-function hit_wall() {
+//
+// Handle movement
+//
+function hitWall() {
   if (hittingWall[0] == true) {
     if (hittingWall[1] == floorBody.id) {
       console.log('hit ground, spawning new block');
@@ -711,52 +739,15 @@ function hit_wall() {
   };
 };
 
-// Animate scene
-function animate() {
-  requestAnimationFrame(animate);
-  now = Date.now();
-  elapsed = now - then;
-
-  // Cannon
-  updatePhysics();
-
-  if (elapsed > fpsInterval) {
-    // Get ready for next frame by setting then=now, but...
-    // Also, adjust for fpsInterval not being multiple of 16.67
-    then = now - (elapsed % fpsInterval);
-
-    // falling();
-    // collisionBoxes();
-    hit_wall();
-
-    // Render
-    cannonDebugRenderer.update();
-    renderer.render(scene, camera);
-  }
-}
-
-// Ensure scene view resizes with window
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-}
-
-// Listen for window resize event
-window.addEventListener('resize', onWindowResize, false);
-
-// Handle movement
 function movePiece(dir) {
   let num = 1;
   if (dir == 'left' || dir == 'north') {
     num = -1
   };
   if (dir == 'left' || dir == 'right') {
-    //currPosX += (4 * num);
     currentPieceBody.position.x += (4 * num);
     currentPiece.position.x += (4 * num);
   } else {
-    //currPosZ += (4 * num);
     currentPieceBody.position.z += (4 * num);
     currentPiece.position.z += (4 * num);
   }
@@ -768,7 +759,6 @@ function rotatePiece(dir) {
     num = 2
   };
   if (dir == 'left' || dir == 'right') {
-    //currRotY += Math.PI / num;
     let axis = new CANNON.Vec3(0,1,0);
     angle += Math.PI / num;
     currentPieceBody.quaternion.setFromAxisAngle(axis, angle);
@@ -787,8 +777,7 @@ function onDocumentKeyDown(event) {
   const keyCode = event.which;
   // Movement
   if (keyCode == 32) {
-    cubeSpeed = 20;
-    console.log('space down');
+    //console.log('space down');
   } else if (keyCode == 68) {
     lastmove = ['move', 'right'];
     movePiece('right');
@@ -831,7 +820,6 @@ document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
   const keyCode = event.which;
   if (keyCode == 32) {
-    cubeSpeed = defaultCubeSpeed;
     //console.log('space up');
   }
   else if (keyCode == 68) {
@@ -859,7 +847,7 @@ function onDocumentKeyUp(event) {
 // Handle microphone input
 window.addEventListener('DOMContentLoaded', () => {
   // Initialize music player controls
-  var music = document.getElementById('soundtrack');
+  let music = document.getElementById('soundtrack');
   music.volume = 0.05;
   music.controls = true;
 
@@ -891,11 +879,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const start = () => {
       main.classList.add("speaking");
       recognition.start();
-      button.textContent = "Stop listening";
       button.hidden = true;
       music.play();
       init();
-      startAnimating(sceneFPS);
     };
 
     const onResult = (event) => {
