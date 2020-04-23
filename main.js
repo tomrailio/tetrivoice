@@ -48,11 +48,8 @@ let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
 
+let lastmove = ['', '']
 let hittingWall = [false, NaN];
-let leftWallHit = false;
-let rightWallHit = false;
-let northWallHit = false;
-let southWallHit = false;
 
 let leftDown = false;
 let rightDown = false;
@@ -514,7 +511,7 @@ function setupWalls() {
   });
   // Left
   leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-  leftWallCube.position.x = -21;
+  leftWallCube.position.x = -20;
   leftWallCube.position.y = 23;
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
@@ -533,7 +530,7 @@ function setupWalls() {
 
   // Right
   rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-  rightWallCube.position.x = 21;
+  rightWallCube.position.x = 20;
   rightWallCube.position.y = 23;
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
@@ -553,7 +550,7 @@ function setupWalls() {
   southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
   southWallCube.position.y = 23;
-  southWallCube.position.z = 20;
+  southWallCube.position.z = 19;
   scene.add(southWallCube);
   southWallCube.name = "southWall"
   southWallCube.geometry.computeBoundingBox();
@@ -572,7 +569,7 @@ function setupWalls() {
   northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
   northWallCube.position.y = 23;
-  northWallCube.position.z = -22;
+  northWallCube.position.z = -21;
   scene.add(northWallCube);
   northWallCube.name = "northWall"
   northWallCube.geometry.computeBoundingBox();
@@ -684,25 +681,32 @@ function hit_wall() {
   if (hittingWall[0] == true) {
     if (hittingWall[1] == floorBody.id) {
       console.log('hit ground, spawning new block');
-      currentPieceBody.removeEventListener('collide');
-      spawnPiece();
-    }
-    if (hittingWall[1] == leftWallBody.id) {
-      console.log('hit left wall, moving back');
-      movePiece('right');
-    }
-    if (hittingWall[1] == rightWallBody.id) {
-      console.log('hit right wall, moving back');
-      movePiece('left');
-    }
-    if (hittingWall[1] == northWallBody.id) {
-      console.log('hit north wall, moving back');
-      movePiece('south');
-    }
-    if (hittingWall[1] == southWallBody.id) {
-      console.log('hit south wall, moving back');
-      movePiece('north');
-    }
+      // currentPieceBody.removeEventListener('collide');
+      // spawnPiece();
+    } else if (lastmove[0] == 'rotate') {
+      if (lastmove[1] == 'left') {
+        rotatePiece('right');
+      } else if (lastmove[1] == 'right') {
+        rotatePiece('left');
+      };
+    } else if (lastmove[0] == 'move') {
+      if (hittingWall[1] == leftWallBody.id) {
+        console.log('hit left wall, moving back');
+        movePiece('right');
+      };
+      if (hittingWall[1] == rightWallBody.id) {
+        console.log('hit right wall, moving back');
+        movePiece('left');
+      };
+      if (hittingWall[1] == northWallBody.id) {
+        console.log('hit north wall, moving back');
+        movePiece('south');
+      };
+      if (hittingWall[1] == southWallBody.id) {
+        console.log('hit south wall, moving back');
+        movePiece('north');
+      };
+    };
     hittingWall[0] = false;
   };
 };
@@ -760,15 +764,21 @@ function movePiece(dir) {
 
 function rotatePiece(dir) {
   let num = -2;
-  if (dir == 'left') {
+  if (dir == 'left' || dir == 'north') {
     num = 2
   };
-  //currRotY += Math.PI / num;
-  var axis = new CANNON.Vec3(0,1,0);
-  angle += Math.PI / num;
-  currentPieceBody.quaternion.setFromAxisAngle(axis, angle);
-  // currentPieceBody.rotation.y += Math.PI / num;
-  // currentPiece.rotation.y += Math.PI / num;
+  if (dir == 'left' || dir == 'right') {
+    //currRotY += Math.PI / num;
+    let axis = new CANNON.Vec3(0,1,0);
+    angle += Math.PI / num;
+    currentPieceBody.quaternion.setFromAxisAngle(axis, angle);
+    // currentPieceBody.rotation.y += Math.PI / num;
+    // currentPiece.rotation.y += Math.PI / num;
+  } else {
+    let axis = new CANNON.Vec3(0,0,1);
+    angle += Math.PI / num;
+    currentPieceBody.quaternion.setFromAxisAngle(axis, angle);
+  }
 }
 
 // Listen for keyboard input
@@ -780,71 +790,37 @@ function onDocumentKeyDown(event) {
     cubeSpeed = 20;
     console.log('space down');
   } else if (keyCode == 68) {
-    // if (rightWallHit) {
-    //   rightDown = false;
-    //   console.log('hitting right wall, not moving');
-    // } else {
-    //   //movePiece('right');
-    //   rightDown = true;
-    // };
+    lastmove = ['move', 'right'];
     movePiece('right');
     document.getElementById('rightArrow').style.backgroundColor = '#ebe834';
     //console.log('d down');
   } else if (keyCode == 65) {
-    // if (leftWallHit) {
-    //   leftDown = false;
-    //   console.log('hitting left wall, not moving');
-    // } else {
-    //   //movePiece('left');
-    //   leftDown = true;
-    // };
+    lastmove = ['move', 'left'];
     movePiece('left');
     document.getElementById('leftArrow').style.backgroundColor = '#ebe834';
     //console.log('a down');
   } else if (keyCode == 87) {
-    // if (northWallHit) {
-    //   northDown = false;
-    //   console.log('hitting north wall, not moving');
-    // } else {
-    //   //movePiece('north');
-    //   northDown = true;
-    // };
+    lastmove = ['move', 'north'];
     movePiece('north');
     document.getElementById('upArrow').style.backgroundColor = '#ebe834';
     //console.log('w down');
   } else if (keyCode == 83) {
-    // if (southWallHit) {
-    //   southDown = false;
-    //   console.log('hitting south wall, not moving');
-    // } else {
-    //   //movePiece('south');
-    //   southDown = true;
-    // };
+    lastmove = ['move', 'south'];
     movePiece('south');
     document.getElementById('downArrow').style.backgroundColor = '#ebe834';
     //console.log('s down');
-  } else if (keyCode == 82) {
-    currentPiece.position.set(-2, 40, 1);
-    //console.log('r down');
+  // } else if (keyCode == 82) {
+  //   currentPiece.position.set(-2, 40, 1);
+  //   //console.log('r down');
   }
   // Rotation
   else if (keyCode == 81) {
-    // if (!hittingWall) {
-    //   leftDown = true;
-    //   // rotatePiece('left');
-    // } else {
-    //   leftDown = false;
-    // };
     rotatePiece('left');
+    lastmove = ['rotate', 'left'];
     //console.log('q down');
   } else if (keyCode == 69) {
-    // if (!hittingWall) {
-    //   rightDown = true;
-    //   // rotatePiece('right');
-    // } else {
-    //   rightDown = false;
-    // };
     rotatePiece('right');
+    lastmove = ['rotate', 'right'];
     //console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
