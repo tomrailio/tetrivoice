@@ -25,6 +25,8 @@ let box;
 let currentPiece;
 let currentPieceBody;
 
+let oldPosition;
+
 let angle = 0;
 let currRotY = 0;
 let currPosX = spawnCord.x;
@@ -46,7 +48,7 @@ let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
 
-let hittingWall = false;
+let hittingWall = [false, NaN];
 let leftWallHit = false;
 let rightWallHit = false;
 let northWallHit = false;
@@ -139,31 +141,31 @@ function spawnPiece() {
     cube3.receiveShadow = true;
     cube3.updateMatrix();
 
-    // For making cube...unsure about keeping
-    const cube4 = new THREE.Mesh(geometry, material);
-    cube4.position.set(0, 4, -4);
-    cube4.castShadow = true;
-    cube4.receiveShadow = true;
-    cube4.updateMatrix();
+    // // For making cube...unsure about keeping
+    // const cube4 = new THREE.Mesh(geometry, material);
+    // cube4.position.set(0, 4, -4);
+    // cube4.castShadow = true;
+    // cube4.receiveShadow = true;
+    // cube4.updateMatrix();
 
-    const cube5 = new THREE.Mesh(geometry, material);
-    cube5.position.set(-4, 4, 0);
-    cube5.updateMatrix();
+    // const cube5 = new THREE.Mesh(geometry, material);
+    // cube5.position.set(-4, 4, 0);
+    // cube5.updateMatrix();
 
-    const cube6 = new THREE.Mesh(geometry, material);
-    cube6.position.set(-4, 4, -4);
-    cube6.castShadow = true;
-    cube6.receiveShadow = true;
-    cube6.updateMatrix();
+    // const cube6 = new THREE.Mesh(geometry, material);
+    // cube6.position.set(-4, 4, -4);
+    // cube6.castShadow = true;
+    // cube6.receiveShadow = true;
+    // cube6.updateMatrix();
 
-    const cube7 = new THREE.Mesh(geometry, material);
-    cube7.position.set(0, 4, 0);
-    cube7.castShadow = true;
-    cube7.receiveShadow = true;
-    cube7.updateMatrix();
+    // const cube7 = new THREE.Mesh(geometry, material);
+    // cube7.position.set(0, 4, 0);
+    // cube7.castShadow = true;
+    // cube7.receiveShadow = true;
+    // cube7.updateMatrix();
 
     currentPiece = new THREE.Mesh(geometry, material);
-    currentPiece.add(cube, cube2, cube3, cube4, cube5, cube6, cube7);
+    currentPiece.add(cube, cube2, cube3);
     currentPiece.castShadow = true;
     currentPiece.receiveShadow = true;
     currentPiece.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
@@ -175,15 +177,15 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,0));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,-4));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
-    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,4,0));
-    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,4,0));
-    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,4,-4));
-    currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,4,-4));
+    // currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,4,0));
+    // currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,4,0));
+    // currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,4,-4));
+    // currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,4,-4));
     currentPieceBody.position.set(spawnCord.x, spawnCord.y, spawnCord.z);
   }
 
@@ -418,8 +420,9 @@ function spawnPiece() {
 
   world.addBody(currentPieceBody);
   currentPieceBody.addEventListener("collide",function(e){
-    console.log("Collided with body:",e.body);
-    console.log("Contact between bodies:",e.contact);
+    // console.log("Collided with body:",e.body);
+    hittingWall = [true, e.body.id]
+    // console.log("Contact between bodies:",e.contact);
   });
 }
 
@@ -511,78 +514,77 @@ function setupWalls() {
   });
   // Left
   leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-  leftWallCube.position.x = -20;
+  leftWallCube.position.x = -21;
   leftWallCube.position.y = 23;
   leftWallCube.position.z = -1;
   scene.add(leftWallCube);
   leftWallCube.name = "leftWall"
   leftWallCube.geometry.computeBoundingBox();
-    // Cannon
-    const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.05, 25, 20));
-    leftWallBody = new CANNON.Body({
-      mass: 0
-    });
-    leftWallBody.addShape(sideWallShape);
-    leftWallBody.position.x = -20;
-    leftWallBody.position.y = 23;
-    leftWallBody.position.z = -1;
-  
-    world.addBody(leftWallBody);
+  // Cannon
+  const sideWallShape = new CANNON.Box(new CANNON.Vec3(0.05, 25, 20));
+  leftWallBody = new CANNON.Body({
+    mass: 0
+  });
+  leftWallBody.addShape(sideWallShape);
+  leftWallBody.position.x = -21;
+  leftWallBody.position.y = 23;
+  leftWallBody.position.z = -1;
+  world.addBody(leftWallBody);
+
   // Right
   rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-  rightWallCube.position.x = 20;
+  rightWallCube.position.x = 21;
   rightWallCube.position.y = 23;
   rightWallCube.position.z = -1;
   scene.add(rightWallCube);
   rightWallCube.name = "rightWall"
   rightWallCube.geometry.computeBoundingBox();
-      // Cannon
-      rightWallBody = new CANNON.Body({
-        mass: 0
-      });
-      rightWallBody.addShape(sideWallShape);
-      rightWallBody.position.x = 20;
-      rightWallBody.position.y = 23;
-      rightWallBody.position.z = -1;
+  // Cannon
+  rightWallBody = new CANNON.Body({
+    mass: 0
+  });
+  rightWallBody.addShape(sideWallShape);
+  rightWallBody.position.x = 21;
+  rightWallBody.position.y = 23;
+  rightWallBody.position.z = -1;
+  world.addBody(rightWallBody);
 
-      world.addBody(rightWallBody);
   // south
   southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   southWallCube.position.x = 0;
   southWallCube.position.y = 23;
-  southWallCube.position.z = 19;
+  southWallCube.position.z = 20;
   scene.add(southWallCube);
   southWallCube.name = "southWall"
   southWallCube.geometry.computeBoundingBox();
-      // Cannon
-      const poleWallShape = new CANNON.Box(new CANNON.Vec3(20, 25, 0.05));
-      southWallBody = new CANNON.Body({
-        mass: 0
-      });
-      southWallBody.addShape(poleWallShape);
-      southWallBody.position.x = 0;
-      southWallBody.position.y = 23;
-      southWallBody.position.z = 19;
-    
-      world.addBody(southWallBody);
+  // Cannon
+  const poleWallShape = new CANNON.Box(new CANNON.Vec3(20, 25, 0.05));
+  southWallBody = new CANNON.Body({
+    mass: 0
+  });
+  southWallBody.addShape(poleWallShape);
+  southWallBody.position.x = 0;
+  southWallBody.position.y = 23;
+  southWallBody.position.z = 20;
+  world.addBody(southWallBody);
+
   // north
   northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
   northWallCube.position.x = 0;
   northWallCube.position.y = 23;
-  northWallCube.position.z = -21;
+  northWallCube.position.z = -22;
   scene.add(northWallCube);
   northWallCube.name = "northWall"
   northWallCube.geometry.computeBoundingBox();
-        // Cannon
-        northWallBody = new CANNON.Body({
-          mass: 0
-        });
-        northWallBody.addShape(poleWallShape);
-        northWallBody.position.x = 0;
-        northWallBody.position.y = 23;
-        northWallBody.position.z = -21;
-      
-        world.addBody(northWallBody);
+  // Cannon
+  northWallBody = new CANNON.Body({
+    mass: 0
+  });
+  northWallBody.addShape(poleWallShape);
+  northWallBody.position.x = 0;
+  northWallBody.position.y = 23;
+  northWallBody.position.z = -22;
+  world.addBody(northWallBody);
 }
 
 // Singular function to initialize scene + rendering
@@ -645,9 +647,9 @@ function init() {
 
 // Cannon
 function initCannon() {
-  world.gravity.set(0,-10,0);
+  world.gravity.set(0,-20,0);
   world.broadphase = new CANNON.NaiveBroadphase();
-  world.solver.iterations = 10;
+  world.solver.iterations = 1;
 }
 
 function updatePhysics() {
@@ -678,6 +680,33 @@ function startAnimating(fps) {
   animate();
 }
 
+function hit_wall() {
+  if (hittingWall[0] == true) {
+    if (hittingWall[1] == floorBody.id) {
+      console.log('hit ground, spawning new block');
+      currentPieceBody.removeEventListener('collide');
+      spawnPiece();
+    }
+    if (hittingWall[1] == leftWallBody.id) {
+      console.log('hit left wall, moving back');
+      movePiece('right');
+    }
+    if (hittingWall[1] == rightWallBody.id) {
+      console.log('hit right wall, moving back');
+      movePiece('left');
+    }
+    if (hittingWall[1] == northWallBody.id) {
+      console.log('hit north wall, moving back');
+      movePiece('south');
+    }
+    if (hittingWall[1] == southWallBody.id) {
+      console.log('hit south wall, moving back');
+      movePiece('north');
+    }
+    hittingWall[0] = false;
+  };
+};
+
 // Animate scene
 function animate() {
   requestAnimationFrame(animate);
@@ -694,6 +723,7 @@ function animate() {
 
     // falling();
     // collisionBoxes();
+    hit_wall();
 
     // Render
     cannonDebugRenderer.update();
