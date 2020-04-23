@@ -19,7 +19,7 @@ let world = new CANNON.World();
 let cannonDebugRenderer;
 
 // Movement
-const defaultCubeSpeed = 2.5;
+const defaultCubeSpeed = -0.05;
 let cubeSpeed = defaultCubeSpeed;
 let angle = 0;
 let lastmove = ['', '']
@@ -131,10 +131,9 @@ function init() {
   setupArena();
   // Spawn initial piece
   spawnPiece();
-  // Initialize physics
-  // Cannon
+  // Initialize Cannon physics
   function initCannon() {
-    world.gravity.set(0,-20,0);
+    world.gravity.set(0,0,0);
     world.broadphase = new CANNON.NaiveBroadphase();
     world.solver.iterations = 1;
   }
@@ -172,6 +171,9 @@ function startAnimating(fps) {
       // Get ready for next frame by setting then=now, but...
       // Also, adjust for fpsInterval not being multiple of 16.67
       then = now - (elapsed % fpsInterval);
+
+      currentPieceBody.position.y += cubeSpeed;
+      currentPiece.position.y += cubeSpeed;
 
       hitWall();
 
@@ -388,7 +390,7 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-12));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
@@ -499,7 +501,7 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,-4));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
@@ -541,7 +543,7 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,4));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(-4,0,-4));
@@ -583,7 +585,7 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,4));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,-4));
@@ -626,7 +628,7 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(4,0,-8));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
@@ -668,7 +670,7 @@ function spawnPiece() {
       mass: 1
     });
     currentPieceBody.angularDamping = 1; // Stops rotating movement
-    currentPieceBody.linearDamping = 0.99;
+    currentPieceBody.linearDamping = 1;
     currentPieceBody.addShape(cubeShape);
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-4));
     currentPieceBody.addShape(cubeShape, new CANNON.Vec3(0,0,-8));
@@ -709,8 +711,7 @@ function hitWall() {
   if (hittingWall[0] == true) {
     if (hittingWall[1] == floorBody.id) {
       console.log('hit ground, spawning new block');
-      // currentPieceBody.removeEventListener('collide');
-      // spawnPiece();
+      spawnPiece();
     } else if (lastmove[0] == 'rotate') {
       if (lastmove[1] == 'left') {
         rotatePiece('right');
@@ -721,16 +722,13 @@ function hitWall() {
       if (hittingWall[1] == leftWallBody.id) {
         console.log('hit left wall, moving back');
         movePiece('right');
-      };
-      if (hittingWall[1] == rightWallBody.id) {
+      } else if (hittingWall[1] == rightWallBody.id) {
         console.log('hit right wall, moving back');
         movePiece('left');
-      };
-      if (hittingWall[1] == northWallBody.id) {
+      } else if (hittingWall[1] == northWallBody.id) {
         console.log('hit north wall, moving back');
         movePiece('south');
-      };
-      if (hittingWall[1] == southWallBody.id) {
+      } else if (hittingWall[1] == southWallBody.id) {
         console.log('hit south wall, moving back');
         movePiece('north');
       };
@@ -777,6 +775,7 @@ function onDocumentKeyDown(event) {
   const keyCode = event.which;
   // Movement
   if (keyCode == 32) {
+    cubeSpeed = -0.2;
     //console.log('space down');
   } else if (keyCode == 68) {
     lastmove = ['move', 'right'];
@@ -820,6 +819,7 @@ document.addEventListener('keyup', onDocumentKeyUp, false);
 function onDocumentKeyUp(event) {
   const keyCode = event.which;
   if (keyCode == 32) {
+    cubeSpeed = defaultCubeSpeed;
     //console.log('space up');
   }
   else if (keyCode == 68) {
