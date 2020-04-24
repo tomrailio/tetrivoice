@@ -60,6 +60,7 @@ let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
 let oldPieces = [];
+let oldMeshes = [];
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -682,13 +683,13 @@ function spawnPiece() {
 
   // Spawn pieces randomly
   const pieces = [
-    spawnIPiece,
-    spawnOPiece,
-    spawnTPiece,
-    spawnSPiece,
-    spawnZPiece,
-    spawnJPiece,
-    spawnLPiece,
+    // spawnIPiece,
+     spawnOPiece,
+    // spawnTPiece,
+    // spawnSPiece,
+    // spawnZPiece,
+    // spawnJPiece,
+    // spawnLPiece,
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
 
@@ -756,6 +757,15 @@ function clearLine() {
   for (let i = 0; i < positions.length; i++) {
     if (positions[i].length == 2) {
       console.log("CLEARING LINE")
+      for (let p = 0; p < positions[i].length; p++) {
+        console.log("DELETING PIECE")
+        console.log(positions[i][p])
+        scene.remove(oldMeshes[p]) // Temporary for testing, update for all meshes
+        oldMeshes[p].geometry.dispose();
+        oldMeshes[p].material.dispose();
+        world.removeBody(positions[i][p]);
+        oldPieces.splice(oldPieces.indexOf(oldMeshes[p]), 1);
+      }
     }
   };
   console.log(positions)
@@ -766,6 +776,7 @@ function hitWall() {
     // console.log(oldPieces.length)
     if (hittingWall[1] == floorBody.id) {
       oldPieces.push(currentPieceBody);
+      oldMeshes.push(currentPiece);
       spawnPiece();
       clearLine();
     } else {
