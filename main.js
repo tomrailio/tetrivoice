@@ -8,6 +8,7 @@ let camera;
 let renderer;
 const spawnCord = new THREE.Vector3(-2, 40, 1);
 const gridSize = 4;
+const numGrids = 10;
 const sceneFPS = 60;
 
 // Cannon Vars
@@ -58,7 +59,7 @@ let leftWallBox = new THREE.Box3();
 let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
-let collisionObjects = [];
+let oldPieces = [];
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -166,7 +167,6 @@ function startAnimating(fps) {
       currentPiece.position.copy(currentPieceBody.position);
       currentPiece.quaternion.copy(currentPieceBody.quaternion);
     }
-    updatePhysics();
 
     if (elapsed > fpsInterval) {
       // Get ready for next frame by setting then=now, but...
@@ -177,6 +177,7 @@ function startAnimating(fps) {
       currentPiece.position.y += cubeSpeed;
 
       hitWall();
+      updatePhysics();
 
       // Render
       cannonDebugRenderer.update();
@@ -208,7 +209,6 @@ function setupArena() {
     floorBody.position.y = -1;
 
     world.addBody(floorBody);
-    collisionObjects.push(floorBody)
 
     // Draw floor grid
     const lineMaterial = new THREE.MeshPhongMaterial({
@@ -709,14 +709,67 @@ function spawnPiece() {
 //
 // Handle movement
 //
+
+//
+// Clear lines
+//
+// -1 == ground
+// ~0.5 == block resting position 1
+// ~4 == block resting position 2
+// ~8 == block resting position 3 etc.
+// TODO: Ensure pieces only collide with each other on top/bottom faces
+//
+function clearLine() {
+  let positions = [];
+  let spawn = false;
+  let line = (numGrids * numGrids) / 4;
+
+  function addPos(pos, piece) {
+    if (!positions[pos]) {
+      positions.push([]);
+    }
+    positions[pos].push(piece);
+  }
+
+  for (let i = 0; i < oldPieces.length; i++) {
+    if (hittingWall[1] == oldPieces[i].id) {
+      spawn = true;
+      oldPieces.push(currentPieceBody);
+    }
+    let pos = oldPieces[i].position.y;
+    console.log(pos)
+    let grids = floorCube.position.y;
+    for (let p = 0; p < numGrids; p++) {
+      if (pos > grids && pos < (grids + gridSize)) {
+        addPos(p, oldPieces[i])
+      }
+      grids += gridSize
+    };
+  };
+  
+  if (spawn == true) {
+    console.log('hit old piece, spawning new block');
+    spawnPiece();
+    // break;
+  }
+
+  for (let i = 0; i < positions.length; i++) {
+    if (positions[i].length == 2) {
+      console.log("CLEARING LINE")
+    }
+  };
+  console.log(positions)
+}
+
 function hitWall() {
   if (hittingWall[0] == true) {
-    for (let i = 0; i < collisionObjects.length; i++) {
-      if (hittingWall[1] == collisionObjects[i].id) {
-        console.log('hit ground, spawning new block');
-        collisionObjects.push(currentPieceBody);
-        spawnPiece();
-      }
+    // console.log(oldPieces.length)
+    if (hittingWall[1] == floorBody.id) {
+      oldPieces.push(currentPieceBody);
+      spawnPiece();
+      clearLine();
+    } else {
+      clearLine();
     };
     if (lastmove[0] == 'rotate') {
       if (lastmove[1] == 'left') {
