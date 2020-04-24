@@ -60,7 +60,6 @@ let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
 let oldPieces = [];
-let oldMeshes = [];
 
 // Load title font
 let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
@@ -177,8 +176,9 @@ function startAnimating(fps) {
       currentPieceBody.position.y += cubeSpeed;
       currentPiece.position.y += cubeSpeed;
 
-      hitWall();
       updatePhysics();
+      hitWall();
+      console.log('hitting wall: ' + hittingWall[0])
 
       // Render
       cannonDebugRenderer.update();
@@ -683,13 +683,13 @@ function spawnPiece() {
 
   // Spawn pieces randomly
   const pieces = [
-    // spawnIPiece,
-     spawnOPiece,
-    // spawnTPiece,
-    // spawnSPiece,
-    // spawnZPiece,
-    // spawnJPiece,
-    // spawnLPiece,
+    spawnIPiece,
+    spawnOPiece,
+    spawnTPiece,
+    spawnSPiece,
+    spawnZPiece,
+    spawnJPiece,
+    spawnLPiece,
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
 
@@ -700,11 +700,13 @@ function spawnPiece() {
   currPosZ = spawnCord.z;
 
   world.addBody(currentPieceBody);
+  hittingWall = [false, NaN]
   currentPieceBody.addEventListener("collide",function(e){
     // console.log("Collided with body:",e.body);
     hittingWall = [true, e.body.id]
     // console.log("Contact between bodies:",e.contact);
   });
+  hittingWall = [false, NaN]
 }
 
 //
@@ -721,89 +723,145 @@ function spawnPiece() {
 // TODO: Ensure pieces only collide with each other on top/bottom faces
 //
 function clearLine() {
-  let positions = [];
+  let positions = []; // necessary to initialize inner because we don't drop yet
   let spawn = false;
   let line = (numGrids * numGrids) / 4;
 
-  function addPos(pos, piece) {
-    if (!positions[pos]) {
-      positions.push([]);
+  function addPos(vec, piece) {
+    console.log(vec)
+    console.log(piece)
+    console.log(positions)
+    console.log(positions[vec])
+    if (positions[vec] == undefined) {
+      //positions[vec].push(piece); // necessary to initialize inner because we don't drop yet
+      // positions.push([])
+      positions[vec] = []
+      
+      // console.log('spliccc')
+      // console.log(positions)
+      // console.log(positions[vec])
+
+      positions[vec].splice(0, 1, piece);
+
+      // console.log('ccclippps')
+      // console.log(positions)
+      // console.log(positions[vec])
+    } else {
+      positions[vec].push(piece);
     }
-    positions[pos].push(piece);
   }
 
   for (let i = 0; i < oldPieces.length; i++) {
-    if (hittingWall[1] == oldPieces[i].id) {
-      spawn = true;
-      oldPieces.push(currentPieceBody);
-    }
-    let pos = oldPieces[i].position.y;
-    console.log(pos)
-    let grids = floorCube.position.y;
+    // if (hittingWall[1] == oldPieces[i][1].id) {
+    //   spawn = true;
+    // }
+    let pos = oldPieces[i][1].position.y;
+    // console.log(oldPieces[i][1].position.y)
+    let gridPos = floorCube.position.y;
+    console.log('first positions:')
+    console.log(positions)
+    // console.log(pos)
+    // console.log(gridPos)
+    // console.log(gridSize)
     for (let p = 0; p < numGrids; p++) {
-      if (pos > grids && pos < (grids + gridSize)) {
-        addPos(p, oldPieces[i])
+      if (pos > gridPos && pos < (gridPos + gridSize)) {
+        addPos(p, oldPieces[i]);
       }
-      grids += gridSize
+      gridPos += gridSize
     };
   };
-  
-  if (spawn == true) {
-    console.log('hit old piece, spawning new block');
-    spawnPiece();
-    // break;
-  }
+
+  // console.log('second positions:') //undefined when clearing
+  // console.log(positions)
+  // console.log('positions length: ' + positions.length) //should update when second row drops but isn't
 
   for (let i = 0; i < positions.length; i++) {
-    if (positions[i].length == 2) {
+    if (positions[i].length == 3) {
+
       console.log("CLEARING LINE")
       for (let p = 0; p < positions[i].length; p++) {
         console.log("DELETING PIECE")
-        console.log(positions[i][p])
-        scene.remove(oldMeshes[p]) // Temporary for testing, update for all meshes
-        oldMeshes[p].geometry.dispose();
-        oldMeshes[p].material.dispose();
-        world.removeBody(positions[i][p]);
-        oldPieces.splice(oldPieces.indexOf(oldMeshes[p]), 1);
+        // console.log(oldPieces)
+        // console.log(positions[i][p]);
+        let obj = positions[i][p][0];
+        scene.remove(obj);
+        obj.geometry.dispose();
+        obj.material.dispose();
+        world.removeBody(positions[i][p][1]);
+        // This line breaks scene....
+        console.log('before delete splice...')
+        console.log(oldPieces)
+        oldPieces.splice(oldPieces.indexOf(positions[i][p]), 1);
+        console.log('after delete splice...')
+        console.log(oldPieces)
       }
     }
+    // Evaluates line 2 second time that clearline is called... (aka after another collision happens after the third block drops....)
+    //positions.shift();
   };
-  console.log(positions)
+
+  if (spawn == true) {
+    console.log('hit old piece, spawning new block');
+    //oldPieces.push([currentPiece, currentPieceBody]);
+    //spawnPiece();
+  };
+  //hittingWall[0] == false;
 }
 
 function hitWall() {
   if (hittingWall[0] == true) {
-    // console.log(oldPieces.length)
-    if (hittingWall[1] == floorBody.id) {
-      oldPieces.push(currentPieceBody);
-      oldMeshes.push(currentPiece);
-      spawnPiece();
-      clearLine();
-    } else {
-      clearLine();
+    console.log('just hit wall...oldpieces')
+
+    let hitPiece = false;
+    console.log('oldpieces array:')
+    console.log(oldPieces.length)
+    console.log(oldPieces)
+    for (let i = 0; i < oldPieces.length; i++) {
+      console.log('checkingpieces: ' + i)
+      if (hittingWall[1] == oldPieces[i][1].id) {
+        if (oldPieces[i][1].id == 16) {
+          break;
+        }
+        console.log('hittingpieces: ' + i + ' -- with id # ' + oldPieces[i][1].id)
+        oldPieces.push([currentPiece, currentPieceBody]);
+        clearLine();
+        spawnPiece();
+        // hitWall();
+        hitPiece = true;
+        break;
+      }
     };
-    if (lastmove[0] == 'rotate') {
-      if (lastmove[1] == 'left') {
-        rotatePiece('right');
-      } else if (lastmove[1] == 'right') {
-        rotatePiece('left');
-      };
-    } else if (lastmove[0] == 'move') {
-      if (hittingWall[1] == leftWallBody.id) {
-        console.log('hit left wall, moving back');
-        movePiece('right');
-      } else if (hittingWall[1] == rightWallBody.id) {
-        console.log('hit right wall, moving back');
-        movePiece('left');
-      } else if (hittingWall[1] == northWallBody.id) {
-        console.log('hit north wall, moving back');
-        movePiece('south');
-      } else if (hittingWall[1] == southWallBody.id) {
-        console.log('hit south wall, moving back');
-        movePiece('north');
+    if (!hitPiece) {
+      if (hittingWall[1] == floorBody.id) {
+        oldPieces.push([currentPiece, currentPieceBody]);
+        clearLine();
+        spawnPiece();
+        // hitWall();
+      } else {
+        if (lastmove[0] == 'rotate') {
+          if (lastmove[1] == 'left') {
+            rotatePiece('right');
+          } else if (lastmove[1] == 'right') {
+            rotatePiece('left');
+          };
+        } else if (lastmove[0] == 'move') {
+          if (hittingWall[1] == leftWallBody.id) {
+            console.log('hit left wall, moving back');
+            movePiece('right');
+          } else if (hittingWall[1] == rightWallBody.id) {
+            console.log('hit right wall, moving back');
+            movePiece('left');
+          } else if (hittingWall[1] == northWallBody.id) {
+            console.log('hit north wall, moving back');
+            movePiece('south');
+          } else if (hittingWall[1] == southWallBody.id) {
+            console.log('hit south wall, moving back');
+            movePiece('north');
+          };
+        };
       };
     };
-    hittingWall[0] = false;
+    hittingWall = [false, NaN]
   };
 };
 
@@ -882,6 +940,7 @@ function onDocumentKeyDown(event) {
     //console.log('e down');
   } else if (keyCode == 84) {
     spawnPiece();
+    //hittingWall = [false, NaN]
   };
 };
 
