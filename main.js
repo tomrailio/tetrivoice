@@ -11,6 +11,10 @@ const gridSize = 4;
 const numGrids = 10;
 const sceneFPS = 60;
 
+// Helper Vars
+let toggleKeyBoard = false;
+let toggleDebug = false;
+
 // Cannon Vars
 let stop = false;
 let frameCount = 0;
@@ -84,7 +88,9 @@ window.addEventListener('resize', function() {
 function init() {
   // Initialize scene
   scene = new THREE.Scene();
-  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world ); // TODO: Add ability to toggle debug renderer
+  if (toggleDebug) {
+    cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
+  }
   scene.background = new THREE.Color( 0xcce0ff );
 
   // Lights
@@ -181,7 +187,9 @@ function startAnimating(fps) {
       console.log('hitting wall: ' + hittingWall[0])
 
       // Render
-      cannonDebugRenderer.update();
+      if (toggleDebug) {
+        cannonDebugRenderer.update();
+      }
       renderer.render(scene, camera);
     }
   }
@@ -876,22 +884,34 @@ function onDocumentKeyDown(event) {
     //console.log('space down');
   } else if (keyCode == 68) {
     lastmove = ['move', 'right'];
-    movePiece('right');
+    if (toggleKeyBoard) {
+      movePiece('right');
+    }
+    rightDown = true;
     document.getElementById('rightArrow').style.backgroundColor = '#ebe834';
     //console.log('d down');
   } else if (keyCode == 65) {
+    leftDown = true;
     lastmove = ['move', 'left'];
-    movePiece('left');
+    if (toggleKeyBoard) {
+      movePiece('left');
+    }
     document.getElementById('leftArrow').style.backgroundColor = '#ebe834';
     //console.log('a down');
   } else if (keyCode == 87) {
+    northDown = true;
     lastmove = ['move', 'north'];
-    movePiece('north');
+    if (toggleKeyBoard) {
+      movePiece('north');
+    }
     document.getElementById('upArrow').style.backgroundColor = '#ebe834';
     //console.log('w down');
   } else if (keyCode == 83) {
+    southDown = true;
     lastmove = ['move', 'south'];
-    movePiece('south');
+    if (toggleKeyBoard) {
+      movePiece('south');
+    }
     document.getElementById('downArrow').style.backgroundColor = '#ebe834';
     //console.log('s down');
   } else if (keyCode == 82) {
@@ -901,11 +921,15 @@ function onDocumentKeyDown(event) {
   }
   // Rotation
   else if (keyCode == 81) {
-    rotatePiece('left');
+    if (toggleKeyBoard) {
+      rotatePiece('left');
+    }
     lastmove = ['rotate', 'left'];
     //console.log('q down');
   } else if (keyCode == 69) {
-    rotatePiece('right');
+    if (toggleKeyBoard) {
+      rotatePiece('right');
+    }
     lastmove = ['rotate', 'right'];
     //console.log('e down');
   } else if (keyCode == 84) {
@@ -1023,8 +1047,10 @@ window.addEventListener('DOMContentLoaded', () => {
           console.log("matched " + voiceCommands[0]);
           if (rightDown) {
             rotatePiece('right');
+            lastmove = ['rotate', 'right'];
           } else if (leftDown) {
             rotatePiece('left');
+            lastmove = ['rotate', 'left'];
           } else {
             console.log('no rotate direction specified');
           }
@@ -1032,12 +1058,16 @@ window.addEventListener('DOMContentLoaded', () => {
           console.log("matched " + voiceCommands[1])
           if (rightDown) {
             movePiece('right');
+            lastmove = ['move', 'right'];
           } else if (leftDown) {
             movePiece('left');
+            lastmove = ['move', 'left'];
           } else if (northDown) {
             movePiece('north');
+            lastmove = ['move', 'north'];
           } else if (southDown) {
             movePiece('south');
+            lastmove = ['move', 'south'];
           } else {
             console.log('no move direction specified');
           }
