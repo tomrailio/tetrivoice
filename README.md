@@ -15,7 +15,7 @@ A variation of Tetris built in 3D and played with your voice.
 ---
 * [Three.js](https://threejs.org/)
 * [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API)
-* [Physijs](https://chandlerprall.github.io/Physijs/) (for physics mode)
+* [Cannon.js](https://schteppe.github.io/cannon.js/) (for collisions and physics modes)
 
 ### Other Third Party Content
 ---
