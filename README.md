@@ -21,6 +21,3 @@ A variation of Tetris built in 3D and played with your voice.
 ---
 ##### Music
 [Game Tunes by Various Artists (Enough Records)](https://archive.org/details/Game_Tunes-14289/)
-
-##### Fonts
-[Tetrominoes by Tim Marriott](https://www.dafont.com/tetrominoes.font)

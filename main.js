@@ -10,7 +10,7 @@ let camera;
 let renderer;
 const spawnCord = new THREE.Vector3(-2, 20, 1);
 const gridSize = 4;
-const numGrids = 10;
+const numGrids = 8;
 const sceneFPS = 60;
 
 // Helper Vars
@@ -222,7 +222,7 @@ function startAnimating(fps) {
 function setupArena() {
   // Spawn arena floor
   function setupGround() {
-    const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
+    const floorGeometry = new THREE.BoxGeometry(45, 0.1, 45);
     const loader = new THREE.TextureLoader();
     // const floorMaterial = new THREE.MeshPhongMaterial({
     //   map: loader.load('./misc/textures/tiledgreyback1.png'),
@@ -254,16 +254,20 @@ function setupArena() {
     // Draws a straight line with two sets of given vector coordinates
     // Ex.: drawLine([,,], [,,]);
     function drawLine() {
+      let num = 0;
+      if (arguments[2] == 'vertical') {
+        num = 1
+      };
       const points = [];
       points.push(new THREE.Vector3(
         arguments[0][0],
         arguments[0][1],
-        arguments[0][2],
+        (arguments[0][2] - num),
       ));
       points.push(new THREE.Vector3(
         arguments[1][0],
         arguments[1][1],
-        arguments[1][2],
+        (arguments[1][2] - num),
       ));
       const line = new THREE.BufferGeometry().setFromPoints(points);
       const newline = new THREE.Line(line, lineMaterial);
@@ -282,7 +286,7 @@ function setupArena() {
         start += arguments[1];
       }
     }
-    horizontalLines([-20, -20, -21], gridSize, 11);
+    horizontalLines([-16, -20, -17], gridSize, (numGrids + 1));
 
     // Draws a specified set of vertical lines at a given start and unit step.
     // Ex.: verticalLines([St,ar,t], Step, Total)
@@ -292,18 +296,19 @@ function setupArena() {
         drawLine(
           [start, arguments[0][1], arguments[0][2]],
           [start, arguments[0][1], -arguments[0][2]],
+          'vertical',
         );
         start += arguments[1];
       }
     }
-    verticalLines([-20, -20, 21], gridSize, 11);
+    verticalLines([-16, -20, 16], gridSize, (numGrids + 1));
   };
 
   // Spawn grid walls
   function setupWalls() {
     // Setup placeholder walls
-    const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 40);
-    const poleWallGeometry = new THREE.BoxGeometry(40, 50, 0.1);
+    const sideWallGeometry = new THREE.BoxGeometry(0.1, 50, 32.5);
+    const poleWallGeometry = new THREE.BoxGeometry(32.5, 50, 0.1);
     const wallMaterial = new THREE.MeshLambertMaterial({
       color: 0x9e0018,
       opacity: 0.1,
@@ -311,7 +316,7 @@ function setupArena() {
     });
     // Left
     leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-    leftWallCube.position.x = -20;
+    leftWallCube.position.x = -16;
     leftWallCube.position.y = 3;
     leftWallCube.position.z = -1;
     scene.add(leftWallCube);
@@ -323,14 +328,14 @@ function setupArena() {
       mass: 0
     });
     leftWallBody.addShape(sideWallShape);
-    leftWallBody.position.x = -21;
+    leftWallBody.position.x = -17;
     leftWallBody.position.y = 3;
     leftWallBody.position.z = -1;
     world.addBody(leftWallBody);
 
     // Right
     rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
-    rightWallCube.position.x = 20;
+    rightWallCube.position.x = 16;
     rightWallCube.position.y = 3;
     rightWallCube.position.z = -1;
     scene.add(rightWallCube);
@@ -341,7 +346,7 @@ function setupArena() {
       mass: 0
     });
     rightWallBody.addShape(sideWallShape);
-    rightWallBody.position.x = 21;
+    rightWallBody.position.x = 17;
     rightWallBody.position.y = 3;
     rightWallBody.position.z = -1;
     world.addBody(rightWallBody);
@@ -350,7 +355,7 @@ function setupArena() {
     southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
     southWallCube.position.x = 0;
     southWallCube.position.y = 3;
-    southWallCube.position.z = 19;
+    southWallCube.position.z = 15;
     scene.add(southWallCube);
     southWallCube.name = "southWall"
     southWallCube.geometry.computeBoundingBox();
@@ -362,14 +367,14 @@ function setupArena() {
     southWallBody.addShape(poleWallShape);
     southWallBody.position.x = 0;
     southWallBody.position.y = 3;
-    southWallBody.position.z = 20;
+    southWallBody.position.z = 16;
     world.addBody(southWallBody);
 
     // north
     northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
     northWallCube.position.x = 0;
     northWallCube.position.y = 3;
-    northWallCube.position.z = -21;
+    northWallCube.position.z = -17;
     scene.add(northWallCube);
     northWallCube.name = "northWall"
     northWallCube.geometry.computeBoundingBox();
@@ -380,7 +385,7 @@ function setupArena() {
     northWallBody.addShape(poleWallShape);
     northWallBody.position.x = 0;
     northWallBody.position.y = 3;
-    northWallBody.position.z = -22;
+    northWallBody.position.z = -18;
     world.addBody(northWallBody);
   };
 
