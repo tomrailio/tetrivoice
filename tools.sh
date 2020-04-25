@@ -32,7 +32,7 @@ package() {
 
 # Build
 build() {
-  rsync -avr --exclude='.git*' --exclude='build/' --exclude='builds/' --exclude='.eslintrc.js' --exclude='tools.sh' ./ ./build/
+  rsync -avr --exclude='node_modules/' --exclude='.git*' --exclude='build/' --exclude='builds/' --exclude='.eslintrc.js' --exclude='tools.sh' ./ ./build/
 
   package
 }

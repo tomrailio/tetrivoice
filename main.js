@@ -3,6 +3,7 @@
 /* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
 
+let score = 0;
 let scene;
 let camera;
 let renderer;
@@ -64,22 +65,6 @@ let rightWallBox = new THREE.Box3();
 let southWallBox = new THREE.Box3();
 let northWallBox = new THREE.Box3();
 let oldPieces = [];
-
-// Load title font
-let tetrominoes_font = new FontFace('Tetrominoes Regular', 'local(Tetrominoes Regular)')
-tetrominoes_font.load().then(function(loaded_face) {
-  document.fonts.add(loaded_face);
-  document.body.style.fontFamily = '"Tetrominoes Regular", Arial';
-}).catch(function(error) {
-  console.log('Couldn\'t find "Tetrominoes" font locally. https://www.dafont.com/tetrominoes.font');
-  tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
-  tetrominoes_font.load().then(function(loaded_face) {
-    document.fonts.add(loaded_face);
-    document.body.style.fontFamily = '"Tetrominoes Regular", Arial';
-  }).catch(function(error) {
-    console.log('Couldn\'t load "Tetrominoes" font. https://www.dafont.com/tetrominoes.font');
-  });
-});
 
 // Listen for window resize event && ensure scene view resizes with window
 window.addEventListener('resize', function() {
@@ -199,6 +184,8 @@ function startAnimating(fps) {
     }
 
     if (elapsed > fpsInterval) {
+      document.getElementById("score").innerHTML = score;
+
       // Get ready for next frame by setting then=now, but...
       // Also, adjust for fpsInterval not being multiple of 16.67
       then = now - (elapsed % fpsInterval);
@@ -758,7 +745,7 @@ function spawnPiece() {
 // TODO: Ensure pieces only collide with each other on top/bottom faces
 //
 function clearLine() {
-  let positions = []; // necessary to initialize inner...
+  let positions = []; // Should probably use object?
   let line = (numGrids * numGrids) / 4;
 
   function addPos(vec, piece) {
@@ -786,6 +773,7 @@ function clearLine() {
     console.log('checking ' + positions[i])
     console.log(positions[i])
     if (positions[i] != undefined && positions[i].length == line) {
+      score += 1000;
       console.log("CLEARING LINE")
       for (let p = 0; p < positions[i].length; p++) {
         console.log("DELETING PIECE")
@@ -843,6 +831,7 @@ function hitWall() {
         console.log('ERROR: Recognized hit as old piece but currentpiece is just spawning.')
         } else {
           console.log('floor piece')
+          score += 10;
           oldPieces.push([currentPiece, currentPieceBody]);
           clearLine();
           spawnPiece();
@@ -850,6 +839,7 @@ function hitWall() {
       }
     } else {
       console.log('old piece')
+      score += 10;
       for (let i = 0; i < oldPieces.length; i++) {
         console.log('checkingpieces: ' + i)
         if (hittingWall[1] == oldPieces[i][1].id) {
@@ -864,10 +854,6 @@ function hitWall() {
         }
       }
     }
-
-    // console.log('just hit wall...oldpieces:')
-    // console.log(oldPieces.length)
-    // console.log(oldPieces)
   };
   hittingWall = [false, NaN]
 };
@@ -943,9 +929,7 @@ function onDocumentKeyDown(event) {
     document.getElementById('downArrow').style.backgroundColor = '#ebe834';
     //console.log('s down');
   } else if (keyCode == 82) {
-    // currentPiece.position.set(-2, 40, 1);
     //console.log('r down');
-    console.log(oldPieces)
   }
   // Rotation
   else if (keyCode == 81) {
@@ -962,7 +946,6 @@ function onDocumentKeyDown(event) {
     //console.log('e down');
   } else if (keyCode == 84) {
     //spawnPiece();
-    //hittingWall = [false, NaN]
   };
 };
 
@@ -1118,6 +1101,10 @@ window.addEventListener('DOMContentLoaded', () => {
     button.addEventListener("click", event => {
       const startMessage = document.getElementById("startText");
       startMessage.style.display = "none"
+      const scoreText = document.getElementById("scoretext");
+      const scoreVar = document.getElementById("score");
+      scoreVar.style.display = "block"
+      scoreText.style.display = "block"
       // startMessage.setAttribute("aria-hidden", "true");
       // startMessage.setAttribute("hidden", "true");
       listening ? stop() : start();
