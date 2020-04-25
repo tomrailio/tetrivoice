@@ -701,11 +701,14 @@ function spawnPiece() {
   currPosZ = spawnCord.z;
 
   currentPieceBody.addEventListener("collide",function(e){
+    if (e.body.position.y < 35) {
       hittingWall = [true, e.body.id]
+    }
       // console.log("Collided with body:",e.body);
       // console.log("Contact between bodies:",e.contact);
   });
   // hittingWall = [false, NaN]
+  console.log('spawning piece with id: ' + currentPiece.id + ' :body: ' + currentPieceBody.id)
 }
 
 //
@@ -795,8 +798,8 @@ function hitWall() {
     } else if (hittingWall[1] == floorBody.id) {
       console.log('floor piece')
       oldPieces.push([currentPiece, currentPieceBody]);
-      spawnPiece();
       clearLine();
+      spawnPiece();
     } else {
       console.log('old piece')
       for (let i = 0; i < oldPieces.length; i++) {
@@ -808,8 +811,8 @@ function hitWall() {
           }
           console.log('hittingpieces: ' + i + ' -- with id # ' + oldPieces[i][1].id)
           oldPieces.push([currentPiece, currentPieceBody]);
-          spawnPiece();
           clearLine();
+          spawnPiece();
         }
       }
     }
@@ -879,9 +882,10 @@ function onDocumentKeyDown(event) {
     movePiece('south');
     document.getElementById('downArrow').style.backgroundColor = '#ebe834';
     //console.log('s down');
-  // } else if (keyCode == 82) {
-  //   currentPiece.position.set(-2, 40, 1);
-  //   //console.log('r down');
+  } else if (keyCode == 82) {
+    // currentPiece.position.set(-2, 40, 1);
+    //console.log('r down');
+    console.log(oldPieces)
   }
   // Rotation
   else if (keyCode == 81) {
@@ -893,7 +897,7 @@ function onDocumentKeyDown(event) {
     lastmove = ['rotate', 'right'];
     //console.log('e down');
   } else if (keyCode == 84) {
-    spawnPiece();
+    //spawnPiece();
     //hittingWall = [false, NaN]
   };
 };
