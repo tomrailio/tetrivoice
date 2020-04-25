@@ -111,15 +111,11 @@ function init() {
 
   // Setup perspective camera
   camera = new THREE.PerspectiveCamera(
-      60,
+      45,
       window.innerWidth / window.innerHeight,
       0.1,
-      1000,
+      500,
   );
-  camera.position.z = 50;
-  camera.position.y = 100;
-  camera.position.x = 0;
-  camera.translateY(10);
 
   // Setup renderer
   renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
@@ -128,11 +124,13 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   // Setup controls
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls = new THREE.OrbitControls(camera, renderer.domElement);  
+  controls.object.position.set(0,50,90);
   controls.enabled = true;
-  controls.enablePan = false;
-  controls.enableZoom = false;
+  controls.enablePan = true;
+  controls.enableZoom = true;
   controls.maxPolarAngle = Math.PI / 2.2;
+  controls.object.updateProjectionMatrix();
   controls.update();
 
   // Spawn arena geometry
@@ -366,6 +364,7 @@ function setupArena() {
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
+  cubeSpeed = defaultCubeSpeed;
   if (currentPiece && currentPiece.position.y > 30) {
     console.log('not spawning new piece...')
     return
@@ -1073,8 +1072,7 @@ window.addEventListener('DOMContentLoaded', () => {
           }
         } else if (matchedWord == voiceCommands[2]) {
           console.log("matched " + voiceCommands[2])
-          // TODO: Ensure pieces drop at same place as they land 'naturally'
-          currentPiece.position.set(currentPiece.position.x, 4, currentPiece.position.z);
+          cubeSpeed = -0.2;
         } else if (matchedWord == voiceCommands[3]) {
           console.log("matched " + voiceCommands[3]);
         } else if (matchedWord == voiceCommands[4]) {
