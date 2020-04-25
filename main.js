@@ -66,12 +66,19 @@ let northWallBox = new THREE.Box3();
 let oldPieces = [];
 
 // Load title font
-let tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
+let tetrominoes_font = new FontFace('Tetrominoes Regular', 'local(Tetrominoes Regular)')
 tetrominoes_font.load().then(function(loaded_face) {
   document.fonts.add(loaded_face);
   document.body.style.fontFamily = '"Tetrominoes Regular", Arial';
 }).catch(function(error) {
-  console.log('Couldn\'t load "Tetrominoes" font. https://www.dafont.com/tetrominoes.font');
+  console.log('Couldn\'t find "Tetrominoes" font locally. https://www.dafont.com/tetrominoes.font');
+  tetrominoes_font = new FontFace('Tetrominoes Regular', 'url(./misc/fonts/tetrominoes.woff2)');
+  tetrominoes_font.load().then(function(loaded_face) {
+    document.fonts.add(loaded_face);
+    document.body.style.fontFamily = '"Tetrominoes Regular", Arial';
+  }).catch(function(error) {
+    console.log('Couldn\'t load "Tetrominoes" font. https://www.dafont.com/tetrominoes.font');
+  });
 });
 
 // Listen for window resize event && ensure scene view resizes with window
@@ -96,7 +103,7 @@ function init() {
 
   // Lights
   scene.add( new THREE.AmbientLight( 0x222222 ) );
-  const light = new THREE.DirectionalLight(0xdfebff, 1);
+  let light = new THREE.DirectionalLight(0xdfebff, 1);
 
   light.position.set(0, 50, 0);
   light.position.multiplyScalar(1.3);
@@ -111,6 +118,32 @@ function init() {
   light.shadow.camera.far = 1000;
   scene.add(light);
 
+  const color = 0xFFFFFF;
+  const intensity = 0.5;
+  const angle = new THREE.MathUtils.degToRad(45);
+  const penumbra = 1;
+  const decay = 1;
+  const spotlight = new THREE.SpotLight(color, intensity);
+  spotlight.position.set(30, 40, -30);
+  spotlight.target.position.set(0, 0, 0);
+  scene.add(spotlight);
+  scene.add(spotlight.target);
+
+  spotlight.position.set(-30, 50, -30);
+  spotlight.target.position.set(0, 0, 30);
+  scene.add(spotlight);
+  scene.add(spotlight.target);
+
+  // spotlight.position.set(0, 40, 40);
+  // spotlight.target.position.set(-5, 0, 0);
+  // scene.add(spotlight);
+  // scene.add(spotlight.target);
+
+  // spotlight.position.set(0, 40, -0);
+  // spotlight.target.position.set(-5, 0, 0);
+  // scene.add(spotlight);
+  // scene.add(spotlight.target);
+
   // Setup perspective camera
   camera = new THREE.PerspectiveCamera(
       45,
@@ -118,11 +151,6 @@ function init() {
       0.1,
       500,
   );
-
-  // let pointLight = new THREE.PointLight(0xffffff);
-  // pointLight.position.set(0,50,0)
-  // camera.add(pointLight)
-  // scene.add(camera)
 
   // Setup renderer
   renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
@@ -205,9 +233,12 @@ function startAnimating(fps) {
 function setupArena() {
   // Spawn arena floor
   function setupGround() {
-    // Setup placeholder floor
     const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
-    const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
+    const loader = new THREE.TextureLoader();
+    const floorMaterial = new THREE.MeshPhongMaterial({
+      map: loader.load('./misc/textures/tiledgreyback1.png'),
+    });
+    //const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
     floorCube = new THREE.Mesh(floorGeometry, floorMaterial, 0);
     floorCube.receiveShadow = true;
     floorCube.position.y = -21;
