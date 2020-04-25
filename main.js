@@ -701,11 +701,9 @@ function spawnPiece() {
   currPosZ = spawnCord.z;
 
   currentPieceBody.addEventListener("collide",function(e){
-    if (e.body.position.y < 35) {
-      hittingWall = [true, e.body.id]
-    }
-      // console.log("Collided with body:",e.body);
-      // console.log("Contact between bodies:",e.contact);
+    hittingWall = [true, e.body.id]
+    // console.log("Collided with body:",e.body);
+    // console.log("Contact between bodies:",e.contact);
   });
   // hittingWall = [false, NaN]
   console.log('spawning piece with id: ' + currentPiece.id + ' :body: ' + currentPieceBody.id)
@@ -768,6 +766,7 @@ function clearLine() {
     }
     console.log(positions)
   }
+  hittingWall = [false, NaN]
 }
 
 function hitWall() {
@@ -796,10 +795,15 @@ function hitWall() {
         }
       }
     } else if (hittingWall[1] == floorBody.id) {
-      console.log('floor piece')
-      oldPieces.push([currentPiece, currentPieceBody]);
-      clearLine();
-      spawnPiece();
+      if (currentPiece.position.y > 5) {
+        // This is a bug. I am currently unsure why it is required.
+        console.log('ERROR: Recognized hit as floor piece but currentpiece is not near floor.')
+      } else {
+        console.log('floor piece')
+        oldPieces.push([currentPiece, currentPieceBody]);
+        clearLine();
+        spawnPiece();
+      }
     } else {
       console.log('old piece')
       for (let i = 0; i < oldPieces.length; i++) {
