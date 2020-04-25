@@ -358,6 +358,10 @@ function setupArena() {
 // Spawn tetrominoes
 // TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
+  if (currentPiece && currentPiece.position.y > 30) {
+    console.log('not spawning new piece...')
+    return
+  }
   function spawnIPiece() {
     const geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
     const material = new THREE.MeshToonMaterial({color: 0x00eaff});
@@ -719,7 +723,6 @@ function spawnPiece() {
 //
 function clearLine() {
   let positions = []; // necessary to initialize inner...
-  let spawn = false;
   let line = (numGrids * numGrids) / 4;
 
   function addPos(vec, piece) {
@@ -746,7 +749,7 @@ function clearLine() {
     console.log(positions)
     console.log('checking ' + positions[i])
     console.log(positions[i])
-    if (positions[i].length == 3) {
+    if (positions[i] != undefined && positions[i].length == 3) {
       console.log("CLEARING LINE")
       for (let p = 0; p < positions[i].length; p++) {
         console.log("DELETING PIECE")
@@ -799,10 +802,15 @@ function hitWall() {
         // This is a bug. I am currently unsure why it is required.
         console.log('ERROR: Recognized hit as floor piece but currentpiece is not near floor.')
       } else {
-        console.log('floor piece')
-        oldPieces.push([currentPiece, currentPieceBody]);
-        clearLine();
-        spawnPiece();
+        if (currentPiece.position.y > 35) {
+        // Same as above for testing...
+        console.log('ERROR: Recognized hit as old piece but currentpiece is just spawning.')
+        } else {
+          console.log('floor piece')
+          oldPieces.push([currentPiece, currentPieceBody]);
+          clearLine();
+          spawnPiece();
+        }
       }
     } else {
       console.log('old piece')
