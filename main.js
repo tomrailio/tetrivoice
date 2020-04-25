@@ -12,7 +12,7 @@ const numGrids = 10;
 const sceneFPS = 60;
 
 // Helper Vars
-let toggleKeyBoard = true;
+let toggleKeyBoard = false;
 let toggleDebug = false;
 
 // Cannon Vars
@@ -785,7 +785,7 @@ function clearLine() {
     console.log(positions)
     console.log('checking ' + positions[i])
     console.log(positions[i])
-    if (positions[i] != undefined && positions[i].length == 3) {
+    if (positions[i] != undefined && positions[i].length == line) {
       console.log("CLEARING LINE")
       for (let p = 0; p < positions[i].length; p++) {
         console.log("DELETING PIECE")
