@@ -176,8 +176,8 @@ function startAnimating(fps) {
       currentPieceBody.position.y += cubeSpeed;
       currentPiece.position.y += cubeSpeed;
 
-      updatePhysics();
       hitWall();
+      updatePhysics();
       console.log('hitting wall: ' + hittingWall[0])
 
       // Render
@@ -693,20 +693,19 @@ function spawnPiece() {
   ];
   pieces[Math.floor((Math.random() * pieces.length))]();
 
+  world.addBody(currentPieceBody);
   currentPiece.updateMatrix();
   currentPiece.updateMatrixWorld();
   currentPiece.updateWorldMatrix(true, true);
   currPosX = spawnCord.x;
   currPosZ = spawnCord.z;
 
-  world.addBody(currentPieceBody);
-  hittingWall = [false, NaN]
   currentPieceBody.addEventListener("collide",function(e){
-    // console.log("Collided with body:",e.body);
-    hittingWall = [true, e.body.id]
-    // console.log("Contact between bodies:",e.contact);
+      hittingWall = [true, e.body.id]
+      // console.log("Collided with body:",e.body);
+      // console.log("Contact between bodies:",e.contact);
   });
-  hittingWall = [false, NaN]
+  // hittingWall = [false, NaN]
 }
 
 //
@@ -715,54 +714,25 @@ function spawnPiece() {
 
 //
 // Clear lines
-//
-// -1 == ground
-// ~0.5 == block resting position 1
-// ~4 == block resting position 2
-// ~8 == block resting position 3 etc.
 // TODO: Ensure pieces only collide with each other on top/bottom faces
 //
 function clearLine() {
-  let positions = []; // necessary to initialize inner because we don't drop yet
+  let positions = []; // necessary to initialize inner...
   let spawn = false;
   let line = (numGrids * numGrids) / 4;
 
   function addPos(vec, piece) {
-    console.log(vec)
-    console.log(piece)
-    console.log(positions)
-    console.log(positions[vec])
     if (positions[vec] == undefined) {
-      //positions[vec].push(piece); // necessary to initialize inner because we don't drop yet
-      // positions.push([])
       positions[vec] = []
-      
-      // console.log('spliccc')
-      // console.log(positions)
-      // console.log(positions[vec])
-
       positions[vec].splice(0, 1, piece);
-
-      // console.log('ccclippps')
-      // console.log(positions)
-      // console.log(positions[vec])
     } else {
       positions[vec].push(piece);
     }
   }
 
   for (let i = 0; i < oldPieces.length; i++) {
-    // if (hittingWall[1] == oldPieces[i][1].id) {
-    //   spawn = true;
-    // }
     let pos = oldPieces[i][1].position.y;
-    // console.log(oldPieces[i][1].position.y)
     let gridPos = floorCube.position.y;
-    console.log('first positions:')
-    console.log(positions)
-    // console.log(pos)
-    // console.log(gridPos)
-    // console.log(gridSize)
     for (let p = 0; p < numGrids; p++) {
       if (pos > gridPos && pos < (gridPos + gridSize)) {
         addPos(p, oldPieces[i]);
@@ -771,98 +741,84 @@ function clearLine() {
     };
   };
 
-  // console.log('second positions:') //undefined when clearing
-  // console.log(positions)
-  // console.log('positions length: ' + positions.length) //should update when second row drops but isn't
-
   for (let i = 0; i < positions.length; i++) {
+    console.log(positions)
+    console.log('checking ' + positions[i])
+    console.log(positions[i])
     if (positions[i].length == 3) {
-
       console.log("CLEARING LINE")
       for (let p = 0; p < positions[i].length; p++) {
         console.log("DELETING PIECE")
-        // console.log(oldPieces)
-        // console.log(positions[i][p]);
+
+        console.log('before delete piece splice...')
+        console.log(oldPieces)
+        oldPieces.splice(oldPieces.indexOf(positions[i][p]), 1);
+        console.log('after delete piece splice...')
+        console.log(oldPieces)
+
         let obj = positions[i][p][0];
         scene.remove(obj);
         obj.geometry.dispose();
         obj.material.dispose();
         world.removeBody(positions[i][p][1]);
-        // This line breaks scene....
-        console.log('before delete splice...')
-        console.log(oldPieces)
-        oldPieces.splice(oldPieces.indexOf(positions[i][p]), 1);
-        console.log('after delete splice...')
-        console.log(oldPieces)
       }
     }
-    // Evaluates line 2 second time that clearline is called... (aka after another collision happens after the third block drops....)
-    //positions.shift();
-  };
-
-  if (spawn == true) {
-    console.log('hit old piece, spawning new block');
-    //oldPieces.push([currentPiece, currentPieceBody]);
-    //spawnPiece();
-  };
-  //hittingWall[0] == false;
+    console.log(positions)
+  }
 }
 
 function hitWall() {
   if (hittingWall[0] == true) {
-    console.log('just hit wall...oldpieces')
-
-    let hitPiece = false;
-    console.log('oldpieces array:')
-    console.log(oldPieces.length)
-    console.log(oldPieces)
-    for (let i = 0; i < oldPieces.length; i++) {
-      console.log('checkingpieces: ' + i)
-      if (hittingWall[1] == oldPieces[i][1].id) {
-        if (oldPieces[i][1].id == 16) {
-          break;
-        }
-        console.log('hittingpieces: ' + i + ' -- with id # ' + oldPieces[i][1].id)
-        oldPieces.push([currentPiece, currentPieceBody]);
-        clearLine();
-        spawnPiece();
-        // hitWall();
-        hitPiece = true;
-        break;
-      }
-    };
-    if (!hitPiece) {
-      if (hittingWall[1] == floorBody.id) {
-        oldPieces.push([currentPiece, currentPieceBody]);
-        clearLine();
-        spawnPiece();
-        // hitWall();
-      } else {
-        if (lastmove[0] == 'rotate') {
-          if (lastmove[1] == 'left') {
-            rotatePiece('right');
-          } else if (lastmove[1] == 'right') {
-            rotatePiece('left');
-          };
-        } else if (lastmove[0] == 'move') {
-          if (hittingWall[1] == leftWallBody.id) {
-            console.log('hit left wall, moving back');
-            movePiece('right');
-          } else if (hittingWall[1] == rightWallBody.id) {
-            console.log('hit right wall, moving back');
-            movePiece('left');
-          } else if (hittingWall[1] == northWallBody.id) {
-            console.log('hit north wall, moving back');
-            movePiece('south');
-          } else if (hittingWall[1] == southWallBody.id) {
-            console.log('hit south wall, moving back');
-            movePiece('north');
-          };
+    if (hittingWall[1] == leftWallBody.id || hittingWall[1] == rightWallBody.id | hittingWall[1] == northWallBody.id || hittingWall[1] == southWallBody.id) {
+      console.log('wall piece')
+      if (lastmove[0] == 'rotate') {
+        if (lastmove[1] == 'left') {
+          rotatePiece('right');
+        } else if (lastmove[1] == 'right') {
+          rotatePiece('left');
         };
-      };
-    };
-    hittingWall = [false, NaN]
+      } else if (lastmove[0] == 'move') {
+        if (hittingWall[1] == leftWallBody.id) {
+          console.log('hit left wall, moving back');
+          movePiece('right');
+        } else if (hittingWall[1] == rightWallBody.id) {
+          console.log('hit right wall, moving back');
+          movePiece('left');
+        } else if (hittingWall[1] == northWallBody.id) {
+          console.log('hit north wall, moving back');
+          movePiece('south');
+        } else if (hittingWall[1] == southWallBody.id) {
+          console.log('hit south wall, moving back');
+          movePiece('north');
+        }
+      }
+    } else if (hittingWall[1] == floorBody.id) {
+      console.log('floor piece')
+      oldPieces.push([currentPiece, currentPieceBody]);
+      spawnPiece();
+      clearLine();
+    } else {
+      console.log('old piece')
+      for (let i = 0; i < oldPieces.length; i++) {
+        console.log('checkingpieces: ' + i)
+        if (hittingWall[1] == oldPieces[i][1].id) {
+          if (oldPieces[i][1].id == floorBody.id) {
+            console.log('ERROR: piece in oldPieces array has id of ground mesh')
+            break;
+          }
+          console.log('hittingpieces: ' + i + ' -- with id # ' + oldPieces[i][1].id)
+          oldPieces.push([currentPiece, currentPieceBody]);
+          spawnPiece();
+          clearLine();
+        }
+      }
+    }
+
+    // console.log('just hit wall...oldpieces:')
+    // console.log(oldPieces.length)
+    // console.log(oldPieces)
   };
+  hittingWall = [false, NaN]
 };
 
 function movePiece(dir) {
@@ -888,8 +844,6 @@ function rotatePiece(dir) {
     let axis = new CANNON.Vec3(0,1,0);
     angle += Math.PI / num;
     currentPieceBody.quaternion.setFromAxisAngle(axis, angle);
-    // currentPieceBody.rotation.y += Math.PI / num;
-    // currentPiece.rotation.y += Math.PI / num;
   } else {
     let axis = new CANNON.Vec3(0,0,1);
     angle += Math.PI / num;
