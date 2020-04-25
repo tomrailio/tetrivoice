@@ -134,19 +134,9 @@ function init() {
   scene.add(spotlight);
   scene.add(spotlight.target);
 
-  // spotlight.position.set(0, 40, 40);
-  // spotlight.target.position.set(-5, 0, 0);
-  // scene.add(spotlight);
-  // scene.add(spotlight.target);
-
-  // spotlight.position.set(0, 40, -0);
-  // spotlight.target.position.set(-5, 0, 0);
-  // scene.add(spotlight);
-  // scene.add(spotlight.target);
-
   // Setup perspective camera
   camera = new THREE.PerspectiveCamera(
-      45,
+      40,
       window.innerWidth / window.innerHeight,
       0.1,
       500,
@@ -160,7 +150,8 @@ function init() {
 
   // Setup controls
   controls = new THREE.OrbitControls(camera, renderer.domElement);  
-  controls.object.position.set(0,50,90);
+  //controls.object.position.set(0,50,90);
+  controls.object.position.set(0,80,70);
   controls.enabled = true;
   controls.enablePan = false;
   controls.enableZoom = false;
