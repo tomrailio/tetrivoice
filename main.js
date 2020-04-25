@@ -6,13 +6,13 @@
 let scene;
 let camera;
 let renderer;
-const spawnCord = new THREE.Vector3(-2, 40, 1);
+const spawnCord = new THREE.Vector3(-2, 20, 1);
 const gridSize = 4;
 const numGrids = 10;
 const sceneFPS = 60;
 
 // Helper Vars
-let toggleKeyBoard = false;
+let toggleKeyBoard = true;
 let toggleDebug = false;
 
 // Cannon Vars
@@ -88,14 +88,16 @@ window.addEventListener('resize', function() {
 function init() {
   // Initialize scene
   scene = new THREE.Scene();
+  scene.fog = new THREE.Fog( 0x050505, 1, 250 );
   if (toggleDebug) {
     cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
   }
-  scene.background = new THREE.Color( 0xcce0ff );
+  scene.background = new THREE.Color( 0x050505 );
 
   // Lights
-  scene.add( new THREE.AmbientLight( 0x666666 ));
+  scene.add( new THREE.AmbientLight( 0x222222 ) );
   const light = new THREE.DirectionalLight(0xdfebff, 1);
+
   light.position.set(0, 50, 0);
   light.position.multiplyScalar(1.3);
   light.castShadow = true;
@@ -117,6 +119,11 @@ function init() {
       500,
   );
 
+  // let pointLight = new THREE.PointLight(0xffffff);
+  // pointLight.position.set(0,50,0)
+  // camera.add(pointLight)
+  // scene.add(camera)
+
   // Setup renderer
   renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
   renderer.shadowMap.enabled = true; // Enable shadows
@@ -127,8 +134,8 @@ function init() {
   controls = new THREE.OrbitControls(camera, renderer.domElement);  
   controls.object.position.set(0,50,90);
   controls.enabled = true;
-  controls.enablePan = true;
-  controls.enableZoom = true;
+  controls.enablePan = false;
+  controls.enableZoom = false;
   controls.maxPolarAngle = Math.PI / 2.2;
   controls.object.updateProjectionMatrix();
   controls.update();
@@ -203,7 +210,7 @@ function setupArena() {
     const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
     floorCube = new THREE.Mesh(floorGeometry, floorMaterial, 0);
     floorCube.receiveShadow = true;
-    floorCube.position.y = -1;
+    floorCube.position.y = -21;
     scene.add(floorCube);
     floorCube.name = "ground"
 
@@ -213,7 +220,7 @@ function setupArena() {
       mass: 0
     });
     floorBody.addShape(cubeShape);
-    floorBody.position.y = -1;
+    floorBody.position.y = -21;
 
     world.addBody(floorBody);
 
@@ -255,7 +262,7 @@ function setupArena() {
         start += arguments[1];
       }
     }
-    horizontalLines([-20, 0, -21], gridSize, 11);
+    horizontalLines([-20, -20, -21], gridSize, 11);
 
     // Draws a specified set of vertical lines at a given start and unit step.
     // Ex.: verticalLines([St,ar,t], Step, Total)
@@ -269,7 +276,7 @@ function setupArena() {
         start += arguments[1];
       }
     }
-    verticalLines([-20, 0, 21], gridSize, 11);
+    verticalLines([-20, -20, 21], gridSize, 11);
   };
 
   // Spawn grid walls
@@ -285,7 +292,7 @@ function setupArena() {
     // Left
     leftWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
     leftWallCube.position.x = -20;
-    leftWallCube.position.y = 23;
+    leftWallCube.position.y = 3;
     leftWallCube.position.z = -1;
     scene.add(leftWallCube);
     leftWallCube.name = "leftWall"
@@ -297,14 +304,14 @@ function setupArena() {
     });
     leftWallBody.addShape(sideWallShape);
     leftWallBody.position.x = -21;
-    leftWallBody.position.y = 23;
+    leftWallBody.position.y = 3;
     leftWallBody.position.z = -1;
     world.addBody(leftWallBody);
 
     // Right
     rightWallCube = new THREE.Mesh(sideWallGeometry, wallMaterial, 0);
     rightWallCube.position.x = 20;
-    rightWallCube.position.y = 23;
+    rightWallCube.position.y = 3;
     rightWallCube.position.z = -1;
     scene.add(rightWallCube);
     rightWallCube.name = "rightWall"
@@ -315,14 +322,14 @@ function setupArena() {
     });
     rightWallBody.addShape(sideWallShape);
     rightWallBody.position.x = 21;
-    rightWallBody.position.y = 23;
+    rightWallBody.position.y = 3;
     rightWallBody.position.z = -1;
     world.addBody(rightWallBody);
 
     // south
     southWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
     southWallCube.position.x = 0;
-    southWallCube.position.y = 23;
+    southWallCube.position.y = 3;
     southWallCube.position.z = 19;
     scene.add(southWallCube);
     southWallCube.name = "southWall"
@@ -334,14 +341,14 @@ function setupArena() {
     });
     southWallBody.addShape(poleWallShape);
     southWallBody.position.x = 0;
-    southWallBody.position.y = 23;
+    southWallBody.position.y = 3;
     southWallBody.position.z = 20;
     world.addBody(southWallBody);
 
     // north
     northWallCube = new THREE.Mesh(poleWallGeometry, wallMaterial, 0);
     northWallCube.position.x = 0;
-    northWallCube.position.y = 23;
+    northWallCube.position.y = 3;
     northWallCube.position.z = -21;
     scene.add(northWallCube);
     northWallCube.name = "northWall"
@@ -352,7 +359,7 @@ function setupArena() {
     });
     northWallBody.addShape(poleWallShape);
     northWallBody.position.x = 0;
-    northWallBody.position.y = 23;
+    northWallBody.position.y = 3;
     northWallBody.position.z = -22;
     world.addBody(northWallBody);
   };
@@ -365,7 +372,7 @@ function setupArena() {
 // TODO: simplify functions/autogenerate pieces
 function spawnPiece() {
   cubeSpeed = defaultCubeSpeed;
-  if (currentPiece && currentPiece.position.y > 30) {
+  if (currentPiece && currentPiece.position.y > (spawnCord.y - 5)) {
     console.log('not spawning new piece...')
     return
   }
@@ -805,11 +812,11 @@ function hitWall() {
         }
       }
     } else if (hittingWall[1] == floorBody.id) {
-      if (currentPiece.position.y > 5) {
+      if (currentPiece.position.y > -5) {
         // This is a bug. I am currently unsure why it is required.
         console.log('ERROR: Recognized hit as floor piece but currentpiece is not near floor.')
       } else {
-        if (currentPiece.position.y > 35) {
+        if (currentPiece.position.y > 25) {
         // Same as above for testing...
         console.log('ERROR: Recognized hit as old piece but currentpiece is just spawning.')
         } else {
