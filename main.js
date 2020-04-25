@@ -4,6 +4,7 @@
 /* eslint-disable require-jsdoc */
 
 let score = 0;
+let paused = false;
 let scene;
 let camera;
 let renderer;
@@ -68,11 +69,22 @@ let oldPieces = [];
 
 // Listen for window resize event && ensure scene view resizes with window
 window.addEventListener('resize', function() {
-  // function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+});
+
+function pause() {
+  if (!paused) {
+    console.log("Pausing game.");
+    document.getElementById("title").innerHTML = 'PAUSED';
+    paused = true;
+  } else if (paused) {
+    console.log("Resuming game.");
+    document.getElementById("title").innerHTML = 'TETRIVOICE';
+    paused = false;
+  }
+}
 
 //
 // Setup scene
@@ -165,7 +177,6 @@ function startAnimating(fps) {
   fpsInterval = 1000 / fps;
   then = Date.now();
   startTime = then;
-  // console.log('start time: ' + startTime);
 
   // Animate scene
   function animate() {
@@ -183,7 +194,7 @@ function startAnimating(fps) {
       currentPiece.quaternion.copy(currentPieceBody.quaternion);
     }
 
-    if (elapsed > fpsInterval) {
+    if (elapsed > fpsInterval && !paused) {
       document.getElementById("score").innerHTML = score;
 
       // Get ready for next frame by setting then=now, but...
@@ -213,10 +224,10 @@ function setupArena() {
   function setupGround() {
     const floorGeometry = new THREE.BoxGeometry(50, 0.1, 50);
     const loader = new THREE.TextureLoader();
-    const floorMaterial = new THREE.MeshPhongMaterial({
-      map: loader.load('./misc/textures/tiledgreyback1.png'),
-    });
-    //const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
+    // const floorMaterial = new THREE.MeshPhongMaterial({
+    //   map: loader.load('./misc/textures/tiledgreyback1.png'),
+    // });
+    const floorMaterial = new THREE.MeshPhongMaterial({color: 0x313a3b});
     floorCube = new THREE.Mesh(floorGeometry, floorMaterial, 0);
     floorCube.receiveShadow = true;
     floorCube.position.y = -21;
@@ -944,8 +955,8 @@ function onDocumentKeyDown(event) {
     }
     lastmove = ['rotate', 'right'];
     //console.log('e down');
-  } else if (keyCode == 84) {
-    //spawnPiece();
+  } else if (keyCode == 27) {
+    pause();
   };
 };
 

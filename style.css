@@ -94,7 +94,7 @@ canvas {
 }
 .startText {
   position: absolute;
-  top: 250px;
+  top: 150px;
   width: 100%;
   text-align: center;
   z-index: 100;
