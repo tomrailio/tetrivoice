@@ -14,7 +14,7 @@ const numGrids = 8;
 const sceneFPS = 60;
 
 // Helper Vars
-let toggleKeyBoard = false;
+let toggleKeyBoard = true;
 let toggleDebug = false;
 
 // Cannon Vars
@@ -48,6 +48,8 @@ const voiceCommands = [
 
 // Geometry
 let box;
+let queuedPiece;
+let queuedPieceName;
 let currentPiece;
 let currentPieceBody;
 let floorCube;
@@ -196,6 +198,7 @@ function startAnimating(fps) {
 
     if (elapsed > fpsInterval && !paused) {
       document.getElementById("score").innerHTML = score;
+      document.getElementById("nextpiece").innerHTML = ('NEXT PIECE: [ ' + queuedPieceName.toUpperCase() + ' ]');
 
       // Get ready for next frame by setting then=now, but...
       // Also, adjust for fpsInterval not being multiple of 16.67
@@ -734,7 +737,14 @@ function spawnPiece() {
     spawnJPiece,
     spawnLPiece,
   ];
-  pieces[Math.floor((Math.random() * pieces.length))]();
+
+  if (!queuedPiece) {
+    pieces[Math.floor((Math.random() * pieces.length))]();
+  } else {
+    pieces[queuedPiece]();
+  }
+  queuedPiece = Math.floor((Math.random() * pieces.length));
+  queuedPieceName = pieces[queuedPiece].name.toLowerCase().replace('spawn','').replace('piece','');
 
   world.addBody(currentPieceBody);
   currentPiece.updateMatrix();
