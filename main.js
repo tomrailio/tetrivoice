@@ -784,11 +784,14 @@ function clearLine() {
     };
   };
 
+
+  let clearedLines = [];
   for (let i = 0; i < positions.length; i++) {
     console.log(positions)
     console.log('checking ' + positions[i])
     console.log(positions[i])
     if (positions[i] != undefined && positions[i].length == line) {
+      clearedLines.push(i);
       score += 1000;
       console.log("CLEARING LINE")
       for (let p = 0; p < positions[i].length; p++) {
@@ -809,6 +812,23 @@ function clearLine() {
     }
     console.log(positions)
   }
+
+  for (let i = 0; i < clearedLines.length; i++) {
+    let oldpos = positions[clearedLines[i]][0][1].position.y;
+    let oldposbody = positions[clearedLines[i]][0][0].position.y;
+    for (let p = 0; p < oldPieces.length; p++) {
+      let newpos = oldPieces[p][1].position.y;
+      let newposbody = oldPieces[p][0].position.y;
+      if (newpos > (oldpos + 1)) {
+        oldPieces[p][1].position.y = (newpos - 4);
+        oldPieces[p][0].position.y = (newposbody - 4);
+        oldPieces[p][0].updateMatrix();
+        oldPieces[p][0].updateMatrixWorld();
+        oldPieces[p][0].updateWorldMatrix(true, true);
+      }
+    }
+  }
+
   hittingWall = [false, NaN]
 }
 
