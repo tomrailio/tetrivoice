@@ -14,7 +14,7 @@ const numGrids = 8;
 const sceneFPS = 60;
 
 // Helper Vars
-let toggleKeyBoard = true;
+let toggleKeyBoard = false;
 let toggleDebug = false;
 
 // Cannon Vars
