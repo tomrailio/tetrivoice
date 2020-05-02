@@ -38,7 +38,9 @@ let rightDown = false;
 let northDown = false;
 let southDown = false;
 
-const voiceCommands = [
+let setLang = 'en-US';
+
+let voiceCommands = [
   'rotate',
   'move',
   'drop',
@@ -86,6 +88,21 @@ function pause() {
     document.getElementById("title").innerHTML = 'TETRIVOICE';
     paused = false;
   }
+}
+
+// Localization Support
+//
+// Default language set as English
+// Get languages from languages.json
+// Show settings page/dropdown menu for languages
+// If user changes localization, look up & set translated commands
+//
+
+function changeLang(lang) {
+  // Set new language
+  setLang = lang;
+  // Translate commands for new language
+  voiceCommands = [newCommands];
 }
 
 //
@@ -759,7 +776,7 @@ function spawnPiece() {
     // console.log("Contact between bodies:",e.contact);
   });
   // hittingWall = [false, NaN]
-  console.log('spawning piece with id: ' + currentPiece.id + ' :body: ' + currentPieceBody.id)
+  //console.log('spawning piece with id: ' + currentPiece.id + ' :body: ' + currentPieceBody.id)
 }
 
 //
@@ -1047,7 +1064,7 @@ window.addEventListener('DOMContentLoaded', () => {
     speechRecognitionList = new SpeechGrammarList();
     speechRecognitionList.addFromString(grammar, 1);
     recognition.grammars = speechRecognitionList;
-    recognition.lang = 'en-US';
+    recognition.lang = setLang;
     recognition.maxAlternatives = 0;
 
     const stop = () => {
@@ -1068,7 +1085,7 @@ window.addEventListener('DOMContentLoaded', () => {
       //console.log(event)
       console.log(event.results[event.results.length - 1])
       for (const res of event.results[event.results.length - 1]) {
-        console.log(res)
+        //console.log(res)
         // Try to filter rapid voice results
         speechSynthesis.pause();
         //console.log(res);
@@ -1101,7 +1118,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
         // console.log(matchedWord);
         if (matchedWord == voiceCommands[0]) {
-          console.log("matched " + voiceCommands[0]);
+          //console.log("matched " + voiceCommands[0]);
           if (rightDown) {
             rotatePiece('right');
             lastmove = ['rotate', 'right'];
@@ -1112,7 +1129,7 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log('no rotate direction specified');
           }
         } else if (matchedWord == voiceCommands[1]) {
-          console.log("matched " + voiceCommands[1])
+          //console.log("matched " + voiceCommands[1])
           if (rightDown) {
             movePiece('right');
             lastmove = ['move', 'right'];

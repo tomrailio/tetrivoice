@@ -85,7 +85,7 @@ canvas {
 #nextpiece {
   color: white;
   position: fixed;
-  bottom: 150px;
+  bottom: 100px;
   text-align: center;
   width: 100%;
   display: block;
