@@ -1,0 +1,17 @@
+{
+  "name": "tetrivoice",
+  "version": "0.0.1",
+  "description": "Tetrivoice is a version of Tetris played with your voice.",
+  "main": "main.js",
+  "repository": "git@github.com:elocnatsirt/tetrivoice.git",
+  "author": "https://github.com/elocnatsirt",
+  "license": "WTFPL",
+  "dependencies": {
+    "cannon-es": "^0.9.1",
+    "google-translate-open-api": "^1.3.2",
+    "three": "^0.116.1"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.4"
+  }
+}

@@ -3,6 +3,10 @@
 /* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
 
+import * as THREE from 'three';
+import * as CANNON from 'cannon-es';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+
 let score = 0;
 let paused = false;
 let scene;
@@ -112,9 +116,9 @@ function init() {
   // Initialize scene
   scene = new THREE.Scene();
   scene.fog = new THREE.Fog( 0x050505, 1, 250 );
-  if (toggleDebug) {
-    cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
-  }
+  // if (toggleDebug) {
+  //   cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
+  // }
   scene.background = new THREE.Color( 0x050505 );
 
   // Lights
@@ -165,8 +169,7 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   // Setup controls
-  controls = new THREE.OrbitControls(camera, renderer.domElement);  
-  //controls.object.position.set(0,50,90);
+  const controls = new OrbitControls(camera, renderer.domElement);
   controls.object.position.set(0,80,70);
   controls.enabled = true;
   controls.enablePan = false;
@@ -1061,7 +1064,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (typeof SpeechRecognition !== "undefined") {
     const recognition = new SpeechRecognition();
-    speechRecognitionList = new SpeechGrammarList();
+    let speechRecognitionList = new SpeechGrammarList();
     speechRecognitionList.addFromString(grammar, 1);
     recognition.grammars = speechRecognitionList;
     recognition.lang = setLang;
