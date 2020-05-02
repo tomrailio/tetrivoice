@@ -22,8 +22,6 @@
       0
     </div>
     <main>
-      <div id="changeLang" class="Change Language">
-      </div>
       <div id="text">
         <button id="button">Start playing</button>
         <p id="message" hidden aria-hidden="true">
@@ -71,11 +69,15 @@
         <br/>
         <u>(Speak clearly/slowly)</u>
         <ul dir='rtl'>
-          <li>ROTATE</li>
-          <li>MOVE</li>
-          <li>DROP</li>
+          <li id='rotate'>ROTATE</li>
+          <li id='move'>MOVE</li>
+          <li id='drop'>DROP</li>
           <!-- <li>SPAWN</li> -->
         </ul>
+        <br/>
+        <label for="languagesDD">Choose a language:</label>
+        <select id="languagesDD">
+        </select>
       </div>
   </body>
   <span id="nextpiece">NEXT PIECE: [ ]</span>

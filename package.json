@@ -9,6 +9,7 @@
   "dependencies": {
     "cannon-es": "^0.9.1",
     "google-translate-open-api": "^1.3.2",
+    "js": "^0.1.0",
     "three": "^0.116.1"
   },
   "devDependencies": {

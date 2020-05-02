@@ -6,6 +6,14 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
+import { selectAll } from 'css-select';
+const langList = require('./js/localizationData.js');
+
+const SpeechRecognition =
+window.SpeechRecognition || window.webkitSpeechRecognition;
+const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+let recognition = new SpeechRecognition();
 
 let score = 0;
 let paused = false;
@@ -41,16 +49,6 @@ let leftDown = false;
 let rightDown = false;
 let northDown = false;
 let southDown = false;
-
-let setLang = 'en-US';
-
-let voiceCommands = [
-  'rotate',
-  'move',
-  'drop',
-  'swap',
-  'spawn'
-];
 
 // Geometry
 let box;
@@ -97,16 +95,32 @@ function pause() {
 // Localization Support
 //
 // Default language set as English
-// Get languages from languages.json
+// Get languages from languages.js
 // Show settings page/dropdown menu for languages
 // If user changes localization, look up & set translated commands
 //
 
-function changeLang(lang) {
-  // Set new language
-  setLang = lang;
-  // Translate commands for new language
-  voiceCommands = [newCommands];
+const browserLang = navigator.language;
+let currentLang = "English (United States)";
+
+function loadLanguages() {
+  const langId = document.getElementById('languagesDD');
+  const langs = Object.keys(langList)
+  for (const l of langs) {
+    if (langList[l]["code"]) {
+      if (langList[l]["code"] == 'en-US') {
+        langId.options[langId.options.length] = new Option(l, langList[l]["code"], true, true);
+      } else {
+        langId.options[langId.options.length] = new Option(l, langList[l]["code"], false, false);
+      }
+    }
+  }
+
+  langId.addEventListener("change", function(){
+    console.log(langId.options[langId.selectedIndex].innerHTML)
+    currentLang = langId.options[langId.selectedIndex].innerHTML;
+    recognition.lang = langList[currentLang]["code"];
+  });
 }
 
 //
@@ -156,10 +170,10 @@ function init() {
 
   // Setup perspective camera
   camera = new THREE.PerspectiveCamera(
-      40,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      500,
+    40,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    500,
   );
 
   // Setup renderer
@@ -1046,6 +1060,7 @@ function onDocumentKeyUp(event) {
 
 // Handle microphone input
 window.addEventListener('DOMContentLoaded', () => {
+  loadLanguages();
   // Initialize music player controls
   let music = document.getElementById('soundtrack');
   music.volume = 0.05;
@@ -1055,19 +1070,14 @@ window.addEventListener('DOMContentLoaded', () => {
   const main = document.getElementsByTagName("main")[0];
 
   let listening = false;
-  const SpeechRecognition =
-    window.SpeechRecognition || window.webkitSpeechRecognition;
-  const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
-  const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
   let grammar = '#JSGF V1.0; grammar movements; public <movement> = move | rotate | drop | spawn ;'
 
   if (typeof SpeechRecognition !== "undefined") {
-    const recognition = new SpeechRecognition();
     let speechRecognitionList = new SpeechGrammarList();
     speechRecognitionList.addFromString(grammar, 1);
     recognition.grammars = speechRecognitionList;
-    recognition.lang = setLang;
+    recognition.lang = langList[currentLang]["code"];
     recognition.maxAlternatives = 0;
 
     const stop = () => {
@@ -1085,13 +1095,9 @@ window.addEventListener('DOMContentLoaded', () => {
     };
 
     const onResult = (event) => {
-      //console.log(event)
-      console.log(event.results[event.results.length - 1])
       for (const res of event.results[event.results.length - 1]) {
-        //console.log(res)
         // Try to filter rapid voice results
         speechSynthesis.pause();
-        //console.log(res);
         let matchedWord = res.transcript.trim().split(' ');
         if (matchedWord.length != 0) {
           matchedWord = matchedWord.sort();
@@ -1108,7 +1114,6 @@ window.addEventListener('DOMContentLoaded', () => {
         countsArr.sort(function(a, b) {
             return a[1] - b[1];
         });          
-          // console.log(countsArr);
           for (let arr in countsArr) {
             if (countsArr[arr][1] > newBig) {
               newBig = arr;
@@ -1119,8 +1124,7 @@ window.addEventListener('DOMContentLoaded', () => {
           matchedWord = countsArr[newBig][0];
         }
 
-        // console.log(matchedWord);
-        if (matchedWord == voiceCommands[0]) {
+        if (matchedWord == langList[currentLang]["voiceCommands"]["rotate"]) {
           //console.log("matched " + voiceCommands[0]);
           if (rightDown) {
             rotatePiece('right');
@@ -1131,7 +1135,7 @@ window.addEventListener('DOMContentLoaded', () => {
           } else {
             console.log('no rotate direction specified');
           }
-        } else if (matchedWord == voiceCommands[1]) {
+        } else if (matchedWord == langList[currentLang]["voiceCommands"]["move"]) {
           //console.log("matched " + voiceCommands[1])
           if (rightDown) {
             movePiece('right');
@@ -1148,14 +1152,14 @@ window.addEventListener('DOMContentLoaded', () => {
           } else {
             console.log('no move direction specified');
           }
-        } else if (matchedWord == voiceCommands[2]) {
-          console.log("matched " + voiceCommands[2])
+        } else if (matchedWord == langList[currentLang]["voiceCommands"]["drop"]) {
+          //console.log("matched " + voiceCommands[2])
           cubeSpeed = -0.2;
-        } else if (matchedWord == voiceCommands[3]) {
-          console.log("matched " + voiceCommands[3]);
-        } else if (matchedWord == voiceCommands[4]) {
+        } else if (matchedWord == langList[currentLang]["voiceCommands"]["swap"]) {
+          //console.log("matched " + voiceCommands[3]);
+        } else if (matchedWord == langList[currentLang]["voiceCommands"]["spawn"]) {
           spawnPiece();
-          console.log("matched " + voiceCommands[4]);
+          //console.log("matched " + voiceCommands[4]);
         } else {
           console.log('No voice commands recognized');
         };
@@ -1171,11 +1175,9 @@ window.addEventListener('DOMContentLoaded', () => {
       const scoreVar = document.getElementById("score");
       scoreVar.style.display = "block"
       scoreText.style.display = "block"
-      // startMessage.setAttribute("aria-hidden", "true");
-      // startMessage.setAttribute("hidden", "true");
       listening ? stop() : start();
       listening = !listening;
-      });
+    });
   } else {
     button.remove();
     const message = document.getElementById("message");
