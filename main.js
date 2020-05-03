@@ -117,9 +117,13 @@ function loadLanguages() {
   }
 
   langId.addEventListener("change", function(){
-    console.log(langId.options[langId.selectedIndex].innerHTML)
+    console.log('Changed language to ' + langId.options[langId.selectedIndex].innerHTML);
     currentLang = langId.options[langId.selectedIndex].innerHTML;
     recognition.lang = langList[currentLang]["code"];
+    // Update displayed commands
+    document.getElementById("rotate").innerHTML = langList[currentLang]["voiceCommands"]["rotate"].toUpperCase();
+    document.getElementById("move").innerHTML = langList[currentLang]["voiceCommands"]["move"].toUpperCase();
+    document.getElementById("drop").innerHTML = langList[currentLang]["voiceCommands"]["drop"].toUpperCase();
   });
 }
 
@@ -232,7 +236,7 @@ function startAnimating(fps) {
 
     if (elapsed > fpsInterval && !paused) {
       document.getElementById("score").innerHTML = score;
-      document.getElementById("nextpiece").innerHTML = ('NEXT PIECE: [ ' + queuedPieceName.toUpperCase() + ' ]');
+      document.getElementById("nextpiece").innerHTML = ('NEXT PIECE: [ <span style="color: yellow">' + queuedPieceName.toUpperCase() + '</span> ]');
 
       // Get ready for next frame by setting then=now, but...
       // Also, adjust for fpsInterval not being multiple of 16.67
@@ -1177,6 +1181,9 @@ window.addEventListener('DOMContentLoaded', () => {
       scoreText.style.display = "block"
       listening ? stop() : start();
       listening = !listening;
+      document.getElementById("languagesDD").setAttribute('disabled', true)
+      document.getElementById("languagesDDlabel").style.display = "none"
+      document.getElementById("languagesDD").style.display = "none"
     });
   } else {
     button.remove();
@@ -1184,6 +1191,6 @@ window.addEventListener('DOMContentLoaded', () => {
     message.removeAttribute("hidden");
     message.setAttribute("aria-hidden", "false");
     const startMessage = document.getElementById("startText");
-    startMessage.style.display = "none"
+    startMessage.style.display = "none";
   }
 });

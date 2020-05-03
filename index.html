@@ -30,12 +30,14 @@
       </div>
       <div id="startText" class="startText">
         <p id="startMessage" hidden="false" aria-hidden="false">
-          <ul>&#9675; Use your microphone to issue voice commands that move the tetrominoes.</ul>
+          <ul>&#9675; Use your microphone to issue voice commands that move the tetrominoes.
+          <br/>
+          (<u><span style="color: yellow">NOTE</u></span>: You can change the recognized language/dialect in the bottom right corner!)</ul>
           <ul>&#9675; Use the WASD keys while speaking to influence the block's direction.</ul>
           <ul>&#9675; Blocks will move in the direction of the key you are <b><u>holding</u></b> (as highlighted).</ul>
           <ul>&#9675; Clicking & moving the mouse rotates the scene. ESC key pauses game.</ul>
           <br/>
-          <ul><u>NOTE:</u> Rotation is currently only left/right.</ul>
+          <ul><u><span style="color: yellow">NOTE</u></span>: Rotation is currently only left/right.</ul>
           <br/>
         </p>
       </div>
@@ -48,7 +50,7 @@
         <br/>
         <br/>
         <br/>
-        <b> &nbsp;  &nbsp;  &nbsp; HOLD KEYS</b>
+        <b> &nbsp;  &nbsp;  &nbsp; <span style="color: yellow">HOLD KEYS</span></b>
         <br/>
         <u>to move while speaking</u>
         <br></br>
@@ -65,18 +67,18 @@
         <br/>
         <br/>
         <br/>
-        <b>VOICE COMMANDS </b>
+        <b><span style="color: yellow">VOICE COMMANDS</span> </b>
         <br/>
         <u>(Speak clearly/slowly)</u>
         <ul dir='rtl'>
-          <li id='rotate'>ROTATE</li>
-          <li id='move'>MOVE</li>
-          <li id='drop'>DROP</li>
+          <b><li id='rotate'>ROTATE</li></b>
+          <b><li id='move'>MOVE</li></b>
+          <b><li id='drop'>DROP</li></b>
           <!-- <li>SPAWN</li> -->
         </ul>
         <br/>
-        <label for="languagesDD">Choose a language:</label>
-        <select id="languagesDD">
+        <label id="languagesDDlabel" for="languagesDD">Choose a language:</label>
+        <select style="max-width: 150px" id="languagesDD">
         </select>
       </div>
   </body>
