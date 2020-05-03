@@ -3,12 +3,6 @@
 /* eslint-disable brace-style */
 /* eslint-disable require-jsdoc */
 
-import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
-import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls'
-import { selectAll } from 'css-select';
-const langList = require('./js/localizationData.js');
-
 const SpeechRecognition =
 window.SpeechRecognition || window.webkitSpeechRecognition;
 const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
@@ -134,9 +128,9 @@ function init() {
   // Initialize scene
   scene = new THREE.Scene();
   scene.fog = new THREE.Fog( 0x050505, 1, 250 );
-  // if (toggleDebug) {
-  //   cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
-  // }
+  if (toggleDebug) {
+    cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
+  }
   scene.background = new THREE.Color( 0x050505 );
 
   // Lights
@@ -187,7 +181,7 @@ function init() {
   document.body.appendChild(renderer.domElement);
 
   // Setup controls
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.object.position.set(0,80,70);
   controls.enabled = true;
   controls.enablePan = false;

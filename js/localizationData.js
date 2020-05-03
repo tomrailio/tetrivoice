@@ -209,19 +209,19 @@ const langList = {
     voiceCommands: {
       rotate: "tourner",
       move: "bouge-toi",
-      drop: "laissez tomber",
+      drop: "tomber",
       swap: "échanger",
       spawn: "frayer"
     }
   },
   "French (France)": {
-    code: "es-FR",
+    code: "fr-FR",
     voiceCommands: {
-      rotate: 'girar',
-      move: 'moverse',
-      drop: 'soltar',
-      swap: 'intercambiar',
-      spawn: 'aparecer'
+      rotate: "tourner",
+      move: "bouge-toi",
+      drop: "tomber",
+      swap: "échanger",
+      spawn: "frayer"
     }
   },
   "Italian (Italy)": "it-IT",
@@ -336,5 +336,3 @@ const langList = {
   "Uzbek (Uzbekistan)": "uz-UZ",
   "Zulu (South Africa)": "zu-ZA"
 }
-
-module.exports = langList;
