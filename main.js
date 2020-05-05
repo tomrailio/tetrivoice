@@ -7,7 +7,7 @@ const SpeechRecognition =
 window.SpeechRecognition || window.webkitSpeechRecognition;
 const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
 const SpeechRecognitionEvent = window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
-let recognition = new SpeechRecognition();
+let recognition;
 
 let score = 0;
 let paused = false;
@@ -1072,6 +1072,7 @@ window.addEventListener('DOMContentLoaded', () => {
   let grammar = '#JSGF V1.0; grammar movements; public <movement> = move | rotate | drop | spawn ;'
 
   if (typeof SpeechRecognition !== "undefined") {
+    recognition = new SpeechRecognition();
     let speechRecognitionList = new SpeechGrammarList();
     speechRecognitionList.addFromString(grammar, 1);
     recognition.grammars = speechRecognitionList;
@@ -1186,5 +1187,6 @@ window.addEventListener('DOMContentLoaded', () => {
     message.setAttribute("aria-hidden", "false");
     const startMessage = document.getElementById("startText");
     startMessage.style.display = "none";
+    document.getElementById("languagesDD").setAttribute('disabled', true);
   }
 });

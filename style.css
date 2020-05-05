@@ -94,7 +94,8 @@ canvas {
 }
 #text {
   position: absolute;
-  top: 100px;
+  top: 250px;
+  font-size: 25px;
   width: 100%;
   text-align: center;
   z-index: 100;
